@@ -45,7 +45,7 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 
 | ID | Document | Status | Purpose |
 | --- | --- | --- | --- |
-| `HARNESS-001` | Agent Execution Harness | Planned | Defines how agents read context, execute tasks, validate, commit, and report results. |
+| `HARNESS-001` | Agent Execution Harness | Draft | Defines how agents read context, execute tasks, validate, commit, and report results. |
 | `GLOSSARY-001` | Glossary and Canonical Invariants | Planned | Defines official names, events, states, commands, errors, and rules that agents must reuse. |
 | `DOMAIN-001` | Domain Model and State Machine | Planned | Defines entities, lifecycle states, transitions, invariants, and invalid cases. |
 | `CONTRACTS-001` | Executable Contracts | Planned | Defines OpenAPI, AsyncAPI, JSON Schemas, and contract validation rules. |
