@@ -14,6 +14,8 @@ This root repository is for product orchestration only. It owns PRDs, specs, pla
 ## Product Workflow
 
 - Use `docs/prd-v1.md` as the source of truth for Mimico V1.
+- Use `docs/adr/ADR-001-ai-assisted-sdd-workflow.md` as the source of truth for the AI-assisted SDD workflow.
+- Use `specs/spec-map.md` to understand the current documentation graph before creating new specs or tasks.
 - Do not treat old PDFs or loose notes as requirements unless they are explicitly promoted into a current spec.
 - Before implementation, derive tasks from a validated spec and include acceptance criteria plus required verification.
 - Keep specs organized by product capability or user flow, not by frontend/backend layer.

@@ -25,3 +25,7 @@ This root repository intentionally ignores `api-mimico/` and `mimico-game/` beca
 The current product source of truth is [docs/prd-v1.md](docs/prd-v1.md).
 
 Historical PDFs and notes in the local workspace may be useful context, but they are not authoritative for V1.
+
+## Workflow
+
+Mimico V1 uses AI-assisted specification-driven development. The workflow decision is recorded in [ADR-001](docs/adr/ADR-001-ai-assisted-sdd-workflow.md), and the live documentation map is [specs/spec-map.md](specs/spec-map.md).
