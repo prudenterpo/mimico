@@ -1,0 +1,18 @@
+# Child repositories are versioned independently.
+api-mimico/
+mimico-game/
+
+# Local/editor noise.
+.DS_Store
+.idea/
+.vscode/
+
+# Generated or temporary artifacts.
+*.log
+tmp/
+dist/
+build/
+
+# Historical source material kept locally for reference, not as source of truth.
+*.pdf
+*.txt
