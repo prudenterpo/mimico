@@ -1,0 +1,18 @@
+{
+  "name": "mimico-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "contracts:validate": "npm run contracts:validate:openapi && node tools/validate-contracts.mjs",
+    "contracts:validate:openapi": "redocly lint contracts/openapi/mimico-v1.yaml",
+    "contracts:validate:asyncapi": "node tools/validate-contracts.mjs --asyncapi-only",
+    "ci": "npm run contracts:validate"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^1.25.15",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "yaml": "^2.6.1"
+  }
+}

@@ -79,6 +79,7 @@ Transport target:
 - `/app/table/invite`
 - `/app/table/invite/accept`
 - `/app/table/invite/reject`
+- `/app/table/{tableId}/chat`
 - `/app/table/teams/assign`
 - `/app/table/match/start`
 - `/app/table/leave`
@@ -94,11 +95,12 @@ Transport target:
 
 - `/topic/lobby/users`
 - `/topic/lobby/chat`
+- `/topic/table/{tableId}/chat`
 - `/topic/table/{tableId}/players`
 - `/topic/table/{tableId}/teams`
 - `/topic/table/{tableId}/match-started`
 - `/topic/table/{tableId}/match-ended`
-- `/topic/table/{tableId}/cancelled`
+- `/topic/table/{tableId}/closed`
 - `/topic/match/{matchId}/initial-turn`
 - `/topic/match/{matchId}/state`
 - `/topic/match/{matchId}/dice`

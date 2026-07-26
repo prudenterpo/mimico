@@ -81,7 +81,7 @@ Verification may include:
 
 - unit tests
 - integration tests
-- contract validation
+- root contract validation with `npm run contracts:validate`
 - build
 - lint
 - typecheck
@@ -113,6 +113,16 @@ Repository rules:
 - frontend: commit from `/Users/rodrigooliveira/personalProjects/mimico/mimico-game`
 
 Cross-repo work requires separate commits in each affected repo.
+
+Default review flow:
+
+- create or use a task-specific branch before committing
+- commit only the files allowed by the task
+- push the task branch when verification is complete
+- open a pull request for Rodrigo's review
+- do not merge the pull request automatically
+- include task ID, test-first pack ID, source specs, verification commands, results, and known deferrals in the PR description
+- for cross-repo work, open separate PRs per repo and document the integration order in each PR
 
 ### 7. Learn
 
@@ -242,9 +252,8 @@ Required fields:
 
 These gaps must be closed before Level 3 background execution is allowed:
 
-- glossary and invariants are not created yet
-- domain model and state machine are not created yet
-- executable contracts are not created yet
-- test strategy is not created yet
-- task graph is not created yet
-- CI gates are not defined yet
+- backend CI and test-profile baseline are not established yet
+- frontend test harness baseline is not established yet
+- repo-local backend/frontend contract conformance tests are not established yet
+- multi-repo E2E harness is not designed yet
+- deploy smoke gate is not executable yet

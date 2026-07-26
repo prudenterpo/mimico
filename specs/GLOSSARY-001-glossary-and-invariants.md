@@ -101,8 +101,10 @@ Events are server-published facts. Contracts will define exact transport and pay
 | `LOBBY_MESSAGE_POSTED` | Global lobby chat message was posted. |
 | `TABLE_CREATED` | Private table was created. |
 | `TABLE_INVITE_RECEIVED` | User received a table invite. |
+| `TABLE_MESSAGE_POSTED` | Table chat message was posted. |
 | `TABLE_PLAYERS_UPDATED` | Table membership changed. |
 | `TABLE_TEAMS_UPDATED` | Host changed team assignment. |
+| `TABLE_CLOSED` | Table was closed and cannot be used anymore. |
 | `MATCH_STARTED` | Match started from a valid table. |
 | `MATCH_STATE_UPDATED` | Match state changed. |
 | `DICE_ROLLED` | Dice value was rolled and position advanced. |

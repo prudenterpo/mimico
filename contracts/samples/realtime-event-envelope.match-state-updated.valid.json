@@ -1,0 +1,8 @@
+{
+  "type": "MATCH_STATE_UPDATED",
+  "data": {
+    "matchId": "33333333-3333-4333-8333-333333333333",
+    "roundState": "ROUND_GUESSING"
+  },
+  "occurredAt": "2026-07-26T18:00:00Z"
+}
