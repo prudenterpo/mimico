@@ -1,0 +1,266 @@
+asyncapi: 3.0.0
+info:
+  title: Mimico Realtime API
+  version: 1.0.0
+  description: STOMP over WebSocket contract for Mimico V1.
+servers:
+  local:
+    host: localhost:8080
+    protocol: ws
+    pathname: /ws
+channels:
+  lobbyUsers:
+    address: /topic/lobby/users
+    messages:
+      OnlineUsersUpdated:
+        $ref: "#/components/messages/OnlineUsersUpdated"
+  lobbyChat:
+    address: /topic/lobby/chat
+    messages:
+      LobbyMessagePosted:
+        $ref: "#/components/messages/LobbyMessagePosted"
+  tablePlayers:
+    address: /topic/table/{tableId}/players
+    parameters:
+      tableId:
+        $ref: "#/components/parameters/tableId"
+    messages:
+      TablePlayersUpdated:
+        $ref: "#/components/messages/TablePlayersUpdated"
+  tableTeams:
+    address: /topic/table/{tableId}/teams
+    parameters:
+      tableId:
+        $ref: "#/components/parameters/tableId"
+    messages:
+      TableTeamsUpdated:
+        $ref: "#/components/messages/TableTeamsUpdated"
+  tableMatchStarted:
+    address: /topic/table/{tableId}/match-started
+    parameters:
+      tableId:
+        $ref: "#/components/parameters/tableId"
+    messages:
+      MatchStarted:
+        $ref: "#/components/messages/MatchStarted"
+  matchState:
+    address: /topic/match/{matchId}/state
+    parameters:
+      matchId:
+        $ref: "#/components/parameters/matchId"
+    messages:
+      MatchStateUpdated:
+        $ref: "#/components/messages/MatchStateUpdated"
+  matchChat:
+    address: /topic/match/{matchId}/chat
+    parameters:
+      matchId:
+        $ref: "#/components/parameters/matchId"
+    messages:
+      GuessReceived:
+        $ref: "#/components/messages/GuessReceived"
+  userInviteQueue:
+    address: /user/queue/invite
+    messages:
+      TableInviteReceived:
+        $ref: "#/components/messages/TableInviteReceived"
+operations:
+  joinLobby:
+    action: send
+    channel:
+      address: /app/lobby/join
+  sendLobbyChat:
+    action: send
+    channel:
+      address: /app/lobby/chat
+    messages:
+      - $ref: "#/components/messages/SendLobbyMessage"
+  sendTableInvite:
+    action: send
+    channel:
+      address: /app/table/invite
+    messages:
+      - $ref: "#/components/messages/SendTableInvite"
+  assignTeams:
+    action: send
+    channel:
+      address: /app/table/teams/assign
+    messages:
+      - $ref: "#/components/messages/AssignTeams"
+  startMatch:
+    action: send
+    channel:
+      address: /app/table/match/start
+    messages:
+      - $ref: "#/components/messages/StartMatchCommand"
+  selectInitialTurnPlayers:
+    action: send
+    channel:
+      address: /app/match/{matchId}/initial-turn/select
+    messages:
+      - $ref: "#/components/messages/SelectInitialTurnPlayers"
+  rollInitialTurnDice:
+    action: send
+    channel:
+      address: /app/match/{matchId}/initial-turn/roll
+  rollDice:
+    action: send
+    channel:
+      address: /app/match/{matchId}/dice/roll
+  drawWordCard:
+    action: send
+    channel:
+      address: /app/match/{matchId}/word/draw
+  selectWord:
+    action: send
+    channel:
+      address: /app/match/{matchId}/word/select
+    messages:
+      - $ref: "#/components/messages/SelectWord"
+  sendGuess:
+    action: send
+    channel:
+      address: /app/match/{matchId}/chat
+    messages:
+      - $ref: "#/components/messages/SendGuess"
+components:
+  parameters:
+    tableId:
+      description: Table UUID.
+    matchId:
+      description: Match UUID.
+  messages:
+    OnlineUsersUpdated:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: ONLINE_USERS_UPDATED
+    LobbyMessagePosted:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: LOBBY_MESSAGE_POSTED
+    TablePlayersUpdated:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: TABLE_PLAYERS_UPDATED
+    TableTeamsUpdated:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: TABLE_TEAMS_UPDATED
+    MatchStarted:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: MATCH_STARTED
+    MatchStateUpdated:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: MATCH_STATE_UPDATED
+              data:
+                $ref: "../schemas/match-state.schema.json"
+    GuessReceived:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: GUESS_RECEIVED
+    TableInviteReceived:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: TABLE_INVITE_RECEIVED
+    SendLobbyMessage:
+      payload:
+        type: object
+        required: [message]
+        properties:
+          message:
+            type: string
+            maxLength: 500
+    SendTableInvite:
+      payload:
+        type: object
+        required: [tableId, invitedUserId]
+        properties:
+          tableId:
+            type: string
+            format: uuid
+          invitedUserId:
+            type: string
+            format: uuid
+    AssignTeams:
+      payload:
+        type: object
+        required: [tableId, teamAssignments]
+        properties:
+          tableId:
+            type: string
+            format: uuid
+          teamAssignments:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items:
+              $ref: "../schemas/team-assignment.schema.json"
+    StartMatchCommand:
+      payload:
+        type: object
+        required: [tableId]
+        properties:
+          tableId:
+            type: string
+            format: uuid
+    SelectInitialTurnPlayers:
+      payload:
+        type: object
+        required: [teamAPlayerId, teamBPlayerId]
+        properties:
+          teamAPlayerId:
+            type: string
+            format: uuid
+          teamBPlayerId:
+            type: string
+            format: uuid
+    SelectWord:
+      payload:
+        type: object
+        required: [wordId]
+        properties:
+          wordId:
+            type: string
+            format: uuid
+    SendGuess:
+      payload:
+        type: object
+        required: [message]
+        properties:
+          message:
+            type: string
+            maxLength: 500

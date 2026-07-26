@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prudenterpo.github.io/mimico/schemas/realtime-event-envelope.schema.json",
+  "title": "RealtimeEventEnvelope",
+  "type": "object",
+  "required": ["type", "data", "occurredAt"],
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]+$"
+    },
+    "data": {
+      "type": "object"
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
