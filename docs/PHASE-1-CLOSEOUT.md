@@ -82,10 +82,12 @@ Phase 2 should update `HARNESS-001` only when:
 
 Phase 2 should begin with:
 
+- `docs/PHASE-2-PLANNING-BRIEF.md`
 - `TASK-GRAPH-001`
 
 The task graph should:
 
+- follow `docs/PHASE-2-PLANNING-BRIEF.md`
 - read all accepted Phase 1 artifacts
 - preserve separate Git flows for root, backend, and frontend repos
 - identify task dependencies
@@ -103,7 +105,7 @@ The first likely implementation task is:
 Use this briefing to start Phase 2:
 
 ```text
-You are planning Phase 2 for Mimico V1. Read `docs/PHASE-1-CLOSEOUT.md`, then read every accepted artifact it references. Do not implement code yet. Produce `TASK-GRAPH-001` first. Preserve repo boundaries: root repo owns docs/contracts/harness, backend is `api-mimico`, frontend is `mimico-game`. Every future task must reference accepted specs/contracts/tests and include verification commands. Treat `PRODUCT-DESIGN-001` as a dependency for major frontend/UI tasks. Create additional Tech Designs only for risky implementation areas discovered during task graph planning.
+Leia `docs/PHASE-2-PLANNING-BRIEF.md` e siga exatamente. Comece apenas pelo `TASK-GRAPH-001`. Não implemente código.
 ```
 
 ## Closeout Criteria
