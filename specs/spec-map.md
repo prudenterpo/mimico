@@ -49,7 +49,7 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 | `GLOSSARY-001` | Glossary and Canonical Invariants | Accepted | Defines official names, events, states, commands, errors, and rules that agents must reuse. |
 | `DOMAIN-001` | Domain Model and State Machine | Accepted | Defines entities, lifecycle states, transitions, invariants, and invalid cases. |
 | `CONTRACTS-001` | Executable Contracts | Accepted | Defines OpenAPI, AsyncAPI, JSON Schemas, and contract validation rules. |
-| `TEST-STRATEGY-001` | Test Strategy | Planned | Defines unit, integration, contract, E2E, smoke, fixture, and CI strategy. |
+| `TEST-STRATEGY-001` | Test Strategy | Accepted | Defines unit, integration, contract, E2E, smoke, fixture, and CI strategy. |
 | `TASK-GRAPH-001` | Task Graph | Planned | Defines executable tasks with dependencies, acceptance criteria, and required verification. |
 
 ## Readiness Rules
