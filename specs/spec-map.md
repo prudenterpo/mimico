@@ -37,7 +37,7 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 | `SPEC-002` | Table and Team Setup | Accepted | `GLOSSARY-001`, `DOMAIN-001`, `CONTRACTS-001` |
 | `SPEC-003` | Match Gameplay | Accepted | `GLOSSARY-001`, `DOMAIN-001`, `CONTRACTS-001` |
 | `SPEC-004` | Video and Chat | Accepted | `GLOSSARY-001`, `DOMAIN-001`, `CONTRACTS-001` |
-| `SPEC-005` | Reconnection and Recovery | Planned | `GLOSSARY-001`, `DOMAIN-001`, `CONTRACTS-001` |
+| `SPEC-005` | Reconnection and Recovery | Accepted | `GLOSSARY-001`, `DOMAIN-001`, `CONTRACTS-001` |
 | `SPEC-006` | Mobile and Desktop Experience | Planned | `GLOSSARY-001`, `DOMAIN-001` |
 | `SPEC-007` | Deploy and Observability | Planned | `GLOSSARY-001`, `CONTRACTS-001` |
 
