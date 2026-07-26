@@ -11,6 +11,7 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 
 - Product source of truth: `docs/prd-v1.md`
 - Workflow decision: `docs/adr/ADR-001-ai-assisted-sdd-workflow.md`
+- Phase 1 closeout: `docs/PHASE-1-CLOSEOUT.md`
 
 ## Artifact Order
 
