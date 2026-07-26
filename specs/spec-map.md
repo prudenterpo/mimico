@@ -60,6 +60,12 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 | --- | --- | --- | --- |
 | `TECH-DESIGN-001` | Contract Validation and CI | Accepted | Defines root contract validation tooling, CI topology, and follow-up CI responsibilities across repos. |
 
+## Planned Contract Readiness Artifacts
+
+| ID | Document | Status | Purpose |
+| --- | --- | --- | --- |
+| `CONTRACT-EXPANSION-BACKLOG-001` | `docs/CONTRACT-EXPANSION-BACKLOG-001.md` | Draft | Tracks accepted contract gaps that block Wave 2 through Wave 5 implementation. |
+
 ## Planned Product Designs
 
 | ID | Document | Status | Purpose |
