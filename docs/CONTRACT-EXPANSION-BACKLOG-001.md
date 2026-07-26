@@ -31,13 +31,14 @@ It does not implement backend or frontend behavior. It does not make architectur
 - `ready-for-contract-edit`: accepted specs, glossary, and domain provide enough information to update OpenAPI, AsyncAPI, schemas, and samples.
 - `requires-tech-design`: implementation-facing contract shape depends on an accepted Tech Design.
 - `blocked-by-spec-conflict`: accepted artifacts disagree and need human/spec review before contract editing.
+- `resolved`: gap has been addressed in accepted docs/contracts and validated.
 
 ## Gap Backlog
 
 | ID | Gap | Source References | Affected Contracts / Schemas | Classification | Blocks | Future Owner / Task |
 | --- | --- | --- | --- | --- | --- | --- |
-| `CONTRACT-GAP-001` | Table chat command and event are required but not present in AsyncAPI. Table chat must be separate from lobby chat and round guess chat. | `SPEC-002` Table Chat; `SPEC-004` Contract Usage and known code mismatches | `contracts/asyncapi/mimico-realtime-v1.yaml`; likely event envelope sample | `ready-for-contract-edit` | Wave 2 table setup, Wave 2 frontend table chat | Root contract edit before `TASK-130`/`TASK-140` |
-| `CONTRACT-GAP-002` | Table close/cancel event naming is inconsistent: `SPEC-002` names `TABLE_CANCELLED`, while glossary/domain define the `TABLE_CLOSED` state and current contract prose lists `/topic/table/{tableId}/cancelled`. | `SPEC-002` WebSocket events; `GLOSSARY-001` Table States; `DOMAIN-001` Table State Machine; `CONTRACTS-001` WebSocket surface | `specs/GLOSSARY-001-glossary-and-invariants.md`; `contracts/asyncapi/mimico-realtime-v1.yaml`; possibly `contracts/CONTRACTS-001-executable-contracts.md` | `blocked-by-spec-conflict` | Wave 2 leave/close table implementation | Human/spec review before contract edit |
+| `CONTRACT-GAP-001` | Table chat command and event were required but not present in AsyncAPI. Table chat must be separate from lobby chat and round guess chat. | `SPEC-002` Table Chat; `SPEC-004` Contract Usage and known code mismatches | `contracts/asyncapi/mimico-realtime-v1.yaml`; event envelope samples | `resolved` | n/a | Resolved by adding `/app/table/{tableId}/chat`, `/topic/table/{tableId}/chat`, and `TABLE_MESSAGE_POSTED`. |
+| `CONTRACT-GAP-002` | Table close/cancel event naming was inconsistent: `SPEC-002` named `TABLE_CANCELLED`, while glossary/domain define the `TABLE_CLOSED` state and contract prose listed `/topic/table/{tableId}/cancelled`. | `SPEC-002` WebSocket events; `GLOSSARY-001` Table States; `DOMAIN-001` Table State Machine; `CONTRACTS-001` WebSocket surface | `specs/GLOSSARY-001-glossary-and-invariants.md`; `contracts/asyncapi/mimico-realtime-v1.yaml`; `contracts/CONTRACTS-001-executable-contracts.md` | `resolved` | n/a | Resolved by standardizing the server event/topic as `TABLE_CLOSED` and `/topic/table/{tableId}/closed`. |
 | `CONTRACT-GAP-003` | Gameplay event channels and payloads are incomplete for accepted `SPEC-003` events beyond `MATCH_STATE_UPDATED` and `GUESS_RECEIVED`. | `SPEC-003` WebSocket Contract Usage; `GLOSSARY-001` Canonical Events; `DOMAIN-001` Round Effects | `contracts/asyncapi/mimico-realtime-v1.yaml`; `contracts/schemas/match-state.schema.json`; event envelope samples | `ready-for-contract-edit` | Wave 3 backend gameplay and frontend gameplay UI | Root contract edit before `TASK-220`/`TASK-230` |
 | `CONTRACT-GAP-004` | `MATCH_PAUSED` event needs a canonical schema including disconnected player identity, pause reason, reconnect deadline, and preserved timer context. | `SPEC-005-US-001`; `SPEC-005` Contract Usage; `DOMAIN-001` Reconnection Model | `contracts/asyncapi/mimico-realtime-v1.yaml`; `contracts/schemas/match-state.schema.json`; possibly new pause event schema; event envelope sample | `requires-tech-design` | Wave 4 reconnection backend/frontend | `TASK-310` first, then root contract edit before `TASK-320`/`TASK-330` |
 | `CONTRACT-GAP-005` | `PLAYER_RECONNECTED` event needs a canonical schema and destination semantics. | `SPEC-005-US-002`; `SPEC-005` Contract Usage; `GLOSSARY-001` Canonical Events | `contracts/asyncapi/mimico-realtime-v1.yaml`; possible reconnect event schema; event envelope sample | `requires-tech-design` | Wave 4 reconnection backend/frontend | `TASK-310` first, then root contract edit before `TASK-320`/`TASK-330` |
@@ -56,13 +57,12 @@ It does not implement backend or frontend behavior. It does not make architectur
 
 Blocking gaps:
 
-- `CONTRACT-GAP-001`
-- `CONTRACT-GAP-002`
+- None from this backlog.
 
 Readiness:
 
-- Table chat is ready for contract edit.
-- Table cancelled/closed naming needs human/spec review first.
+- Table chat command/event is contracted.
+- Table close/cancel naming is standardized as the `TABLE_CLOSED` event and `/topic/table/{tableId}/closed` topic.
 
 ### Wave 3 - Core Gameplay
 
@@ -107,8 +107,8 @@ Readiness:
 
 ## Recommended Next Contract Work
 
-1. Resolve `CONTRACT-GAP-002` and `CONTRACT-GAP-006` with human/spec review because they involve naming conflicts.
-2. Create a focused contract edit task for Wave 2 table chat after `CONTRACT-GAP-002` is resolved or explicitly deferred.
+1. Resolve `CONTRACT-GAP-006` with human/spec review because it involves restored-state event naming.
+2. Address `CONTRACT-GAP-003` before Wave 3 gameplay implementation.
 3. Keep reconnection schema edits blocked until `TASK-310` is accepted.
 4. Keep media readiness and video signaling blocked until `TASK-410` is accepted.
 

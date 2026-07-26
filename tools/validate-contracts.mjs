@@ -23,7 +23,9 @@ const sampleSchemaMap = {
   "match-state.active.valid.json": "match-state.schema.json",
   "match-state.paused.valid.json": "match-state.schema.json",
   "realtime-event-envelope.match-state-updated.valid.json": "realtime-event-envelope.schema.json",
-  "realtime-event-envelope.match-paused.valid.json": "realtime-event-envelope.schema.json"
+  "realtime-event-envelope.match-paused.valid.json": "realtime-event-envelope.schema.json",
+  "realtime-event-envelope.table-message-posted.valid.json": "realtime-event-envelope.schema.json",
+  "realtime-event-envelope.table-closed.valid.json": "realtime-event-envelope.schema.json"
 };
 
 function readText(relativePath) {

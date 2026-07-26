@@ -208,10 +208,11 @@ Client commands:
 Server events:
 
 - `TABLE_INVITE_RECEIVED`
+- `TABLE_MESSAGE_POSTED`
 - `TABLE_PLAYERS_UPDATED`
 - `TABLE_TEAMS_UPDATED`
 - `MATCH_STARTED`
-- `TABLE_CANCELLED`
+- `TABLE_CLOSED`
 
 All server events must use the standard event envelope from `CONTRACTS-001`.
 

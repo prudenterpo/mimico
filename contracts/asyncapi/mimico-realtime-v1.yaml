@@ -27,6 +27,14 @@ channels:
     messages:
       TablePlayersUpdated:
         $ref: "#/components/messages/TablePlayersUpdated"
+  tableChat:
+    address: /topic/table/{tableId}/chat
+    parameters:
+      tableId:
+        $ref: "#/components/parameters/tableId"
+    messages:
+      TableMessagePosted:
+        $ref: "#/components/messages/TableMessagePosted"
   tableTeams:
     address: /topic/table/{tableId}/teams
     parameters:
@@ -43,6 +51,14 @@ channels:
     messages:
       MatchStarted:
         $ref: "#/components/messages/MatchStarted"
+  tableClosed:
+    address: /topic/table/{tableId}/closed
+    parameters:
+      tableId:
+        $ref: "#/components/parameters/tableId"
+    messages:
+      TableClosed:
+        $ref: "#/components/messages/TableClosed"
   matchState:
     address: /topic/match/{matchId}/state
     parameters:
@@ -81,6 +97,24 @@ operations:
       address: /app/table/invite
     messages:
       - $ref: "#/components/messages/SendTableInvite"
+  acceptTableInvite:
+    action: send
+    channel:
+      address: /app/table/invite/accept
+    messages:
+      - $ref: "#/components/messages/InviteDecision"
+  rejectTableInvite:
+    action: send
+    channel:
+      address: /app/table/invite/reject
+    messages:
+      - $ref: "#/components/messages/InviteDecision"
+  sendTableChat:
+    action: send
+    channel:
+      address: /app/table/{tableId}/chat
+    messages:
+      - $ref: "#/components/messages/SendTableMessage"
   assignTeams:
     action: send
     channel:
@@ -93,6 +127,12 @@ operations:
       address: /app/table/match/start
     messages:
       - $ref: "#/components/messages/StartMatchCommand"
+  leaveTable:
+    action: send
+    channel:
+      address: /app/table/leave
+    messages:
+      - $ref: "#/components/messages/LeaveTable"
   selectInitialTurnPlayers:
     action: send
     channel:
@@ -154,6 +194,34 @@ components:
             properties:
               type:
                 const: TABLE_PLAYERS_UPDATED
+    TableMessagePosted:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: TABLE_MESSAGE_POSTED
+              data:
+                type: object
+                required: [tableId, senderUserId, senderDisplayName, message, sentAt]
+                additionalProperties: false
+                properties:
+                  tableId:
+                    type: string
+                    format: uuid
+                  senderUserId:
+                    type: string
+                    format: uuid
+                  senderDisplayName:
+                    type: string
+                  message:
+                    type: string
+                    minLength: 1
+                    maxLength: 500
+                  sentAt:
+                    type: string
+                    format: date-time
     TableTeamsUpdated:
       payload:
         allOf:
@@ -170,6 +238,25 @@ components:
             properties:
               type:
                 const: MATCH_STARTED
+    TableClosed:
+      payload:
+        allOf:
+          - $ref: "../schemas/realtime-event-envelope.schema.json"
+          - type: object
+            properties:
+              type:
+                const: TABLE_CLOSED
+              data:
+                type: object
+                required: [tableId, reason]
+                additionalProperties: false
+                properties:
+                  tableId:
+                    type: string
+                    format: uuid
+                  reason:
+                    type: string
+                    enum: [HOST_LEFT, HOST_CLOSED, SYSTEM_CLOSED]
     MatchStateUpdated:
       payload:
         allOf:
@@ -215,6 +302,26 @@ components:
           invitedUserId:
             type: string
             format: uuid
+    InviteDecision:
+      payload:
+        type: object
+        required: [tableId, inviteId]
+        properties:
+          tableId:
+            type: string
+            format: uuid
+          inviteId:
+            type: string
+            format: uuid
+    SendTableMessage:
+      payload:
+        type: object
+        required: [message]
+        properties:
+          message:
+            type: string
+            minLength: 1
+            maxLength: 500
     AssignTeams:
       payload:
         type: object
@@ -229,6 +336,14 @@ components:
             maxItems: 2
             items:
               $ref: "../schemas/team-assignment.schema.json"
+    LeaveTable:
+      payload:
+        type: object
+        required: [tableId]
+        properties:
+          tableId:
+            type: string
+            format: uuid
     StartMatchCommand:
       payload:
         type: object
