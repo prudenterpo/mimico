@@ -315,6 +315,7 @@ Recommended execution order inside Wave 1:
 - Root planning/contracts branch pattern: `feature/task-010-contract-validation`, `feature/task-020-contract-expansion`.
 - Backend branch pattern from inside `api-mimico`: `feature/task-110-backend-auth-lobby`.
 - Frontend branch pattern from inside `mimico-game`: `feature/task-120-frontend-auth-lobby`.
+- Default integration flow is branch, commit, push, and open PR for Rodrigo's review; agents must not merge automatically.
 - Cross-repo work must use separate branches and PRs per repo, with integration order documented in both PR descriptions.
 - Contract changes should merge before backend/frontend consumers unless a coordinated PR stack explicitly says otherwise.
 - First Wave PR order: root contract validation, root contract expansion, backend CI baseline, frontend test harness baseline.

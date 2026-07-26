@@ -114,6 +114,16 @@ Repository rules:
 
 Cross-repo work requires separate commits in each affected repo.
 
+Default review flow:
+
+- create or use a task-specific branch before committing
+- commit only the files allowed by the task
+- push the task branch when verification is complete
+- open a pull request for Rodrigo's review
+- do not merge the pull request automatically
+- include task ID, test-first pack ID, source specs, verification commands, results, and known deferrals in the PR description
+- for cross-repo work, open separate PRs per repo and document the integration order in each PR
+
 ### 7. Learn
 
 If implementation exposes ambiguity, missing decisions, weak contracts, missing tests, or environment gaps, update the relevant document before continuing.
