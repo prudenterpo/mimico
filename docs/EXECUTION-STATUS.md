@@ -77,11 +77,14 @@ These PRs should be reviewed before starting Wave 2 implementation:
 
 Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://github.com/prudenterpo/mimico/pull/1).
 
-- `[ ]` `TASK-110` - Backend auth, session, lobby presence, lobby chat
+- `[>]` `TASK-110` - Backend auth, session, lobby presence, lobby chat
   - Repo: backend `api-mimico`
   - Prompt: `prompts/PROMPT-110.md`
   - Test-first: `test-first/TEST-FIRST-110.md`
-  - Recommended next action after prerequisite PRs merge: execute `PROMPT-110`.
+  - Branch: `feature/task-110-backend-auth-lobby`
+  - PR: [prudenterpo/api-mimico#3](https://github.com/prudenterpo/api-mimico/pull/3)
+  - Verification observed: `JAVA_HOME=/Users/rodrigooliveira/Library/Java/JavaVirtualMachines/jbr-21.0.8/Contents/Home ./mvnw test` passed with 62 tests; `npm run contracts:validate` passed with existing Redocly warnings.
+  - Notes: backend WebSocket behavior covered by controller/interceptor/service tests; full STOMP integration remains deferred to later harness work.
 
 - `[ ]` `TASK-120` - Frontend auth and lobby integration
   - Repo: frontend `mimico-game`
