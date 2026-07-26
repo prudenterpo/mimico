@@ -1,0 +1,9 @@
+{
+  "type": "MATCH_PAUSED",
+  "data": {
+    "matchId": "33333333-3333-4333-8333-333333333333",
+    "disconnectedUserId": "22222222-2222-4222-8222-222222222222",
+    "reconnectDeadline": "2026-07-26T18:01:30Z"
+  },
+  "occurredAt": "2026-07-26T18:00:30Z"
+}

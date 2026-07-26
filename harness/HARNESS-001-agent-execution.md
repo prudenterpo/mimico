@@ -81,7 +81,7 @@ Verification may include:
 
 - unit tests
 - integration tests
-- contract validation
+- root contract validation with `npm run contracts:validate`
 - build
 - lint
 - typecheck
@@ -242,9 +242,8 @@ Required fields:
 
 These gaps must be closed before Level 3 background execution is allowed:
 
-- glossary and invariants are not created yet
-- domain model and state machine are not created yet
-- executable contracts are not created yet
-- test strategy is not created yet
-- task graph is not created yet
-- CI gates are not defined yet
+- backend CI and test-profile baseline are not established yet
+- frontend test harness baseline is not established yet
+- repo-local backend/frontend contract conformance tests are not established yet
+- multi-repo E2E harness is not designed yet
+- deploy smoke gate is not executable yet

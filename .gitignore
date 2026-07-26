@@ -12,6 +12,7 @@ mimico-game/
 tmp/
 dist/
 build/
+node_modules/
 
 # Historical source material kept locally for reference, not as source of truth.
 *.pdf
