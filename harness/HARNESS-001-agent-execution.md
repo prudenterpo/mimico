@@ -23,6 +23,7 @@ When available, agents must also load:
 - `specs/GLOSSARY-001-glossary-and-invariants.md`
 - `specs/DOMAIN-001-domain-model-state-machine.md`
 - `contracts/CONTRACTS-001-executable-contracts.md`
+- `docs/EXECUTION-STATUS.md`
 - the relevant functional spec
 - the relevant task definition
 
@@ -137,6 +138,9 @@ Learning updates may affect:
 - test strategy
 - task graph
 - harness
+- execution status
+
+At the end of every task, update `docs/EXECUTION-STATUS.md` with the task status, branch, PR URL if available, verification result, and any deferrals.
 
 ## Autonomy Levels
 
