@@ -52,6 +52,12 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 | `TEST-STRATEGY-001` | Test Strategy | Accepted | Defines unit, integration, contract, E2E, smoke, fixture, and CI strategy. |
 | `TASK-GRAPH-001` | Task Graph | Planned | Defines executable tasks with dependencies, acceptance criteria, and required verification. |
 
+## Planned Tech Designs
+
+| ID | Document | Status | Purpose |
+| --- | --- | --- | --- |
+| `TECH-DESIGN-001` | Contract Validation and CI | Accepted | Defines root contract validation tooling, CI topology, and follow-up CI responsibilities across repos. |
+
 ## Readiness Rules
 
 - A functional spec is not ready until it references the glossary and domain model.
