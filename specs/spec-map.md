@@ -59,6 +59,12 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 | --- | --- | --- | --- |
 | `TECH-DESIGN-001` | Contract Validation and CI | Accepted | Defines root contract validation tooling, CI topology, and follow-up CI responsibilities across repos. |
 
+## Planned Product Designs
+
+| ID | Document | Status | Purpose |
+| --- | --- | --- | --- |
+| `PRODUCT-DESIGN-001` | Visual System and Screen Layouts | Accepted | Defines visual direction, layout hierarchy, component direction, motion, and portfolio quality bar for V1. |
+
 ## Readiness Rules
 
 - A functional spec is not ready until it references the glossary and domain model.

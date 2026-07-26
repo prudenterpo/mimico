@@ -20,6 +20,7 @@ Phase 1 includes:
 - domain model and state machines
 - executable contracts
 - functional specs
+- product design direction
 - test strategy
 - first technical design for contract validation and CI
 
@@ -50,6 +51,7 @@ Phase 1 does not include:
 | `SPEC-005` | `specs/SPEC-005-reconnection-recovery.md` | Accepted |
 | `SPEC-006` | `specs/SPEC-006-mobile-desktop-experience.md` | Accepted |
 | `SPEC-007` | `specs/SPEC-007-deploy-observability.md` | Accepted |
+| `PRODUCT-DESIGN-001` | `docs/product-design/PRODUCT-DESIGN-001-visual-system-and-screen-layouts.md` | Accepted |
 | `TEST-STRATEGY-001` | `specs/TEST-STRATEGY-001-test-strategy.md` | Accepted |
 | `TECH-DESIGN-001` | `docs/tech-design/TECH-DESIGN-001-contract-validation-and-ci.md` | Accepted |
 
@@ -71,6 +73,7 @@ Phase 2 should update `HARNESS-001` only when:
 - Specs and contracts are authority when legacy tests or implementation disagree.
 - Domain states and executable contracts must guide implementation tasks.
 - Functional specs are complete enough for V1 execution planning.
+- Visual system and screen layout direction are accepted as V1 quality bar, not post-MVP polish.
 - Additional Tech Designs should be created only when the task graph identifies a risky technical area.
 - Root contract validation and CI are the first executable harness implementation target.
 - Task graph, task files, test-first packs, and prompts belong to Phase 2.
@@ -88,6 +91,7 @@ The task graph should:
 - identify task dependencies
 - identify parallelizable work packages
 - identify required Tech Designs before risky tasks
+- treat `PRODUCT-DESIGN-001` as a dependency for major frontend/UI tasks
 - require every implementation task to reference specs, contracts, tests, and verification commands
 
 The first likely implementation task is:
@@ -99,7 +103,7 @@ The first likely implementation task is:
 Use this briefing to start Phase 2:
 
 ```text
-You are planning Phase 2 for Mimico V1. Read `docs/PHASE-1-CLOSEOUT.md`, then read every accepted artifact it references. Do not implement code yet. Produce `TASK-GRAPH-001` first. Preserve repo boundaries: root repo owns docs/contracts/harness, backend is `api-mimico`, frontend is `mimico-game`. Every future task must reference accepted specs/contracts/tests and include verification commands. Create additional Tech Designs only for risky implementation areas discovered during task graph planning.
+You are planning Phase 2 for Mimico V1. Read `docs/PHASE-1-CLOSEOUT.md`, then read every accepted artifact it references. Do not implement code yet. Produce `TASK-GRAPH-001` first. Preserve repo boundaries: root repo owns docs/contracts/harness, backend is `api-mimico`, frontend is `mimico-game`. Every future task must reference accepted specs/contracts/tests and include verification commands. Treat `PRODUCT-DESIGN-001` as a dependency for major frontend/UI tasks. Create additional Tech Designs only for risky implementation areas discovered during task graph planning.
 ```
 
 ## Closeout Criteria
