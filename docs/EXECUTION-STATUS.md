@@ -117,7 +117,7 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
   - Branch: `feature/task-140-frontend-table-setup`
   - Local commit: `098dd52`
   - Verification observed: `npm test` passed with 22 tests; `npm run build` passed outside sandbox after Turbopack process/port creation was blocked by sandbox, with existing multiple-lockfile root warning.
-  - PR: not opened yet; push to GitHub requires explicit user approval.
+  - PR: [prudenterpo/mimico-game#5](https://github.com/prudenterpo/mimico-game/pull/5)
 
 ## Wave 3 - Core Gameplay Without Video Architecture
 
