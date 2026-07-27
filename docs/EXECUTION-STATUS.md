@@ -87,13 +87,14 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
   - Merge status: merged on 2026-07-26.
   - Notes: backend WebSocket behavior covered by controller/interceptor/service tests; full STOMP integration remains deferred to later harness work.
 
-- `[>]` `TASK-120` - Frontend auth and lobby integration
+- `[x]` `TASK-120` - Frontend auth and lobby integration
   - Repo: frontend `mimico-game`
   - Prompt: `prompts/PROMPT-120.md`
   - Test-first: `test-first/TEST-FIRST-120.md`
   - Branch: `feature/task-120-frontend-auth-lobby`
   - PR: [prudenterpo/mimico-game#4](https://github.com/prudenterpo/mimico-game/pull/4)
   - Verification observed: `npm test` passed with 15 tests; `npm run build` passed outside sandbox after Turbopack process/port creation was blocked by sandbox, with existing multiple-lockfile root warning.
+  - Merge status: merged on 2026-07-27.
   - Notes: PR is stacked on `feature/task-040-frontend-test-harness`; invite accept/reject completion remains deferred to `TASK-140`.
   - Depends on: `TASK-110`
 
