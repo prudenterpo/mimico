@@ -28,7 +28,7 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 10. `TECH-DESIGN-*`: Technical design docs for risky implementation areas
 11. `TASK-GRAPH-001`: Executable task graph
 12. `TEST-FIRST-*`: Test-first packs
-13. `PROMPT-*`: Implementation prompts
+13. executable `TASK-*` entry instructions
 14. `RELEASE-001`: Review and release checklists
 
 ## Planned Functional Specs
@@ -77,4 +77,4 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 - A functional spec is not ready until it references the glossary and domain model.
 - A task is not ready until it references a spec, relevant contracts, acceptance criteria, and verification steps.
 - A contract-sensitive task is not ready until the executable contract exists or the task explicitly includes creating it.
-- Implementation prompts are generated only after the relevant task is ready.
+- Task files are the executable entrypoints once they include agent entry instructions, test-first pack links, source documents, scope, verification, and review rules.

@@ -4,6 +4,10 @@ Status: Draft for Approval
 Target repo: backend `api-mimico`
 Autonomy level: Level 1 - Single Task
 
+## Agent Entry Instructions
+
+Execute this task file directly. Before editing files, read and follow `harness/AGENT-ENTRY-INSTRUCTIONS.md`.
+
 ## Objective
 
 Implement the backend authenticated entry and lobby foundation for Mimico V1: register, login, session restoration, logout, online-user presence, and lobby chat.
@@ -127,6 +131,7 @@ Stop and ask for review if:
 - generated clients/types appear necessary
 - test setup requires production secrets or external services
 - table, gameplay, video, reconnection, root contract, or frontend changes become necessary
+
 
 ## Expected Commit / PR Notes
 

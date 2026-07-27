@@ -29,7 +29,7 @@ The official artifact order is:
 10. Tech Design Docs
 11. Task Graph
 12. Test-First Packs
-13. Implementation Prompts
+13. Executable Task Entry Instructions
 14. Review & Release Checklists
 
 Functional specs will be organized by product capability or user flow, not by frontend/backend layer.

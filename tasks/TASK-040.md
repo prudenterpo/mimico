@@ -4,6 +4,10 @@ Status: Draft for Approval
 Target repo: frontend `mimico-game`
 Autonomy level: Level 1 - Single Task
 
+## Agent Entry Instructions
+
+Execute this task file directly. Before editing files, read and follow `harness/AGENT-ENTRY-INSTRUCTIONS.md`.
+
 ## Objective
 
 Establish the frontend repository's baseline verification and test harness before major UI or client-state implementation begins.
@@ -106,6 +110,7 @@ Stop and ask for review if:
 - generated clients/types become necessary
 - root contracts need to change
 - backend changes are needed
+
 
 ## Expected Commit / PR Notes
 

@@ -182,7 +182,7 @@ Regras operacionais:
 - toda tarefa deve citar a spec que a originou
 - mudancas grandes devem ser quebradas em entregas pequenas
 - toda feature precisa ter estrategia de teste definida antes da implementacao
-- prompts para IA devem apontar para documentos fonte, nao para instrucoes vagas no chat
+- instrucoes para IA devem apontar para documentos fonte, nao para instrucoes vagas no chat
 
 ## 12. Definicao preliminar de pronto
 

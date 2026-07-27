@@ -9,6 +9,10 @@ This file is the operational checklist for Mimico V1 execution.
 
 Use it before starting any new task to avoid re-running work that is already planned, implemented, published, or waiting for review.
 
+Executor agents should be started from `tasks/TASK-XXX.md` directly. Each task file points to `harness/AGENT-ENTRY-INSTRUCTIONS.md` and contains its own source documents, scope, verification commands, and commit/PR expectations. The old `prompts/PROMPT-XXX.md` wrappers are deprecated.
+
+Before editing files for a task, agents must confirm the task is not `[x] Done` and not `[>] In review`. If it is done or in review, report the status and do not re-execute it. For execution rules, follow `harness/AGENT-ENTRY-INSTRUCTIONS.md` and `harness/HARNESS-001-agent-execution.md`.
+
 Agents must update this file when they:
 
 - create planning artifacts
@@ -47,28 +51,28 @@ These PRs should be reviewed before starting Wave 2 implementation:
 
 - `[>]` `TASK-010` - Root contract validation and CI
   - Repo: root `mimico`
-  - Prompt: `prompts/PROMPT-010.md`
+  - Entry: `tasks/TASK-010.md`
   - Test-first: `test-first/TEST-FIRST-010.md`
   - PR: [prudenterpo/mimico#1](https://github.com/prudenterpo/mimico/pull/1)
   - Verification observed: `npm run contracts:validate` passed with existing Redocly warnings.
 
 - `[>]` `TASK-020` - Contract expansion backlog and Wave 2 table contract gaps
   - Repo: root `mimico`
-  - Prompt: `prompts/PROMPT-020.md`
+  - Entry: `tasks/TASK-020.md`
   - Test-first: `test-first/TEST-FIRST-020.md`
   - PR: [prudenterpo/mimico#1](https://github.com/prudenterpo/mimico/pull/1)
   - Notes: `CONTRACT-GAP-001` and `CONTRACT-GAP-002` resolved in local commit `affa173`, included in root PR.
 
 - `[>]` `TASK-030` - Backend CI and test-profile baseline
   - Repo: backend `api-mimico`
-  - Prompt: `prompts/PROMPT-030.md`
+  - Entry: `tasks/TASK-030.md`
   - Test-first: `test-first/TEST-FIRST-030.md`
   - PR: [prudenterpo/api-mimico#2](https://github.com/prudenterpo/api-mimico/pull/2)
   - Verification observed: GitHub Actions `test` passed after aligning `ReconnectionServiceTest`; local `./mvnw test` passed with JDK 21 compiling release 17.
 
 - `[>]` `TASK-040` - Frontend test harness baseline
   - Repo: frontend `mimico-game`
-  - Prompt: `prompts/PROMPT-040.md`
+  - Entry: `tasks/TASK-040.md`
   - Test-first: `test-first/TEST-FIRST-040.md`
   - PR: [prudenterpo/mimico-game#3](https://github.com/prudenterpo/mimico-game/pull/3)
   - Notes: awaiting review/merge.
@@ -79,7 +83,7 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
 
 - `[x]` `TASK-110` - Backend auth, session, lobby presence, lobby chat
   - Repo: backend `api-mimico`
-  - Prompt: `prompts/PROMPT-110.md`
+  - Entry: `tasks/TASK-110.md`
   - Test-first: `test-first/TEST-FIRST-110.md`
   - Branch: `feature/task-110-backend-auth-lobby`
   - PR: [prudenterpo/api-mimico#3](https://github.com/prudenterpo/api-mimico/pull/3)
@@ -89,7 +93,7 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
 
 - `[x]` `TASK-120` - Frontend auth and lobby integration
   - Repo: frontend `mimico-game`
-  - Prompt: `prompts/PROMPT-120.md`
+  - Entry: `tasks/TASK-120.md`
   - Test-first: `test-first/TEST-FIRST-120.md`
   - Branch: `feature/task-120-frontend-auth-lobby`
   - PR: [prudenterpo/mimico-game#4](https://github.com/prudenterpo/mimico-game/pull/4)
@@ -100,7 +104,7 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
 
 - `[x]` `TASK-130` - Backend table, invites, manual teams, explicit start
   - Repo: backend `api-mimico`
-  - Prompt: `prompts/PROMPT-130.md`
+  - Entry: `tasks/TASK-130.md`
   - Test-first: `test-first/TEST-FIRST-130.md`
   - Branch: `feature/task-130-backend-table-setup`
   - PR: [prudenterpo/api-mimico#4](https://github.com/prudenterpo/api-mimico/pull/4)
@@ -111,7 +115,7 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
 
 - `[ ]` `TASK-140` - Frontend table setup and team assignment
   - Repo: frontend `mimico-game`
-  - Prompt: `prompts/PROMPT-140.md`
+  - Entry: `tasks/TASK-140.md`
   - Test-first: `test-first/TEST-FIRST-140.md`
   - Depends on: `TASK-120`, `TASK-130`
 

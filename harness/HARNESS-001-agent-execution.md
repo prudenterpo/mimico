@@ -236,15 +236,17 @@ Work is merge-ready only when:
 - commit was made in the correct repository
 - final report includes changed files, verification results, and follow-up risks
 
-## Prompt Shape
+## Executable Task Shape
 
-Implementation prompts should be written like GitHub issues.
+Task files are the executor entrypoint and should be written like GitHub issues. Separate `prompts/PROMPT-*` wrappers are deprecated when they duplicate a one-to-one task file.
 
 Required fields:
 
 - task ID
+- agent entry instructions linking to `harness/AGENT-ENTRY-INSTRUCTIONS.md`
 - objective
 - context documents
+- test-first pack
 - repo
 - scope
 - acceptance criteria

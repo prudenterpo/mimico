@@ -261,7 +261,7 @@ If a contract validation failure reveals that a spec and contract disagree, the 
 | Tooling churn around AsyncAPI parsers. | Keep script wrapper stable even if implementation package changes. |
 | Root CI gives false confidence because backend/frontend are separate. | Explicitly scope root CI to contracts/docs and add repo-local CI follow-ups. |
 | Samples become stale or too few. | Require sample update when schema changes. |
-| Agents bypass validation. | Add command requirement to task graph and implementation prompts. |
+| Agents bypass validation. | Add command requirement to task graph and executable task entry instructions. |
 | Contract validation becomes too slow. | Keep root validation app-free and dependency-light. |
 
 ## Acceptance Criteria
