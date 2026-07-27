@@ -98,14 +98,14 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
   - Notes: PR is stacked on `feature/task-040-frontend-test-harness`; invite accept/reject completion remains deferred to `TASK-140`.
   - Depends on: `TASK-110`
 
-- `[>]` `TASK-130` - Backend table, invites, manual teams, explicit start
+- `[x]` `TASK-130` - Backend table, invites, manual teams, explicit start
   - Repo: backend `api-mimico`
   - Prompt: `prompts/PROMPT-130.md`
   - Test-first: `test-first/TEST-FIRST-130.md`
   - Branch: `feature/task-130-backend-table-setup`
   - PR: [prudenterpo/api-mimico#4](https://github.com/prudenterpo/api-mimico/pull/4)
   - Verification observed: `JAVA_HOME=/Users/rodrigooliveira/Library/Java/JavaVirtualMachines/jbr-21.0.8/Contents/Home ./mvnw test` passed with 72 tests; `npm run contracts:validate` passed with existing Redocly warnings.
-  - Merge status: awaiting review.
+  - Merge status: merged on 2026-07-27 via `cc66e4b`.
   - Notes: implements backend table setup through `MATCH_SETUP`; full STOMP integration and gameplay beyond match creation remain deferred to later tasks.
   - Depends on: `TASK-110`
 
