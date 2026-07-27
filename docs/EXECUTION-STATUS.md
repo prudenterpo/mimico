@@ -109,7 +109,7 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
   - Notes: implements backend table setup through `MATCH_SETUP`; full STOMP integration and gameplay beyond match creation remain deferred to later tasks.
   - Depends on: `TASK-110`
 
-- `[~]` `TASK-140` - Frontend table setup and team assignment
+- `[x]` `TASK-140` - Frontend table setup and team assignment
   - Repo: frontend `mimico-game`
   - Prompt: `prompts/PROMPT-140.md`
   - Test-first: `test-first/TEST-FIRST-140.md`
@@ -118,6 +118,7 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
   - Local commit: `098dd52`
   - Verification observed: `npm test` passed with 22 tests; `npm run build` passed outside sandbox after Turbopack process/port creation was blocked by sandbox, with existing multiple-lockfile root warning.
   - PR: [prudenterpo/mimico-game#5](https://github.com/prudenterpo/mimico-game/pull/5)
+  - Merge status: merged on 2026-07-27.
 
 ## Wave 3 - Core Gameplay Without Video Architecture
 
