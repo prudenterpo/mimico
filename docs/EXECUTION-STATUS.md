@@ -1,7 +1,7 @@
 # EXECUTION-STATUS - Mimico V1 Task Progress
 
 Status: Active
-Last updated: 2026-07-26
+Last updated: 2026-07-27
 
 ## Purpose
 
@@ -87,16 +87,26 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
   - Merge status: merged on 2026-07-26.
   - Notes: backend WebSocket behavior covered by controller/interceptor/service tests; full STOMP integration remains deferred to later harness work.
 
-- `[ ]` `TASK-120` - Frontend auth and lobby integration
+- `[x]` `TASK-120` - Frontend auth and lobby integration
   - Repo: frontend `mimico-game`
   - Prompt: `prompts/PROMPT-120.md`
   - Test-first: `test-first/TEST-FIRST-120.md`
+  - Branch: `feature/task-120-frontend-auth-lobby`
+  - PR: [prudenterpo/mimico-game#4](https://github.com/prudenterpo/mimico-game/pull/4)
+  - Verification observed: `npm test` passed with 15 tests; `npm run build` passed outside sandbox after Turbopack process/port creation was blocked by sandbox, with existing multiple-lockfile root warning.
+  - Merge status: merged on 2026-07-27.
+  - Notes: PR is stacked on `feature/task-040-frontend-test-harness`; invite accept/reject completion remains deferred to `TASK-140`.
   - Depends on: `TASK-110`
 
-- `[ ]` `TASK-130` - Backend table, invites, manual teams, explicit start
+- `[>]` `TASK-130` - Backend table, invites, manual teams, explicit start
   - Repo: backend `api-mimico`
   - Prompt: `prompts/PROMPT-130.md`
   - Test-first: `test-first/TEST-FIRST-130.md`
+  - Branch: `feature/task-130-backend-table-setup`
+  - PR: [prudenterpo/api-mimico#4](https://github.com/prudenterpo/api-mimico/pull/4)
+  - Verification observed: `JAVA_HOME=/Users/rodrigooliveira/Library/Java/JavaVirtualMachines/jbr-21.0.8/Contents/Home ./mvnw test` passed with 72 tests; `npm run contracts:validate` passed with existing Redocly warnings.
+  - Merge status: awaiting review.
+  - Notes: implements backend table setup through `MATCH_SETUP`; full STOMP integration and gameplay beyond match creation remain deferred to later tasks.
   - Depends on: `TASK-110`
 
 - `[ ]` `TASK-140` - Frontend table setup and team assignment
