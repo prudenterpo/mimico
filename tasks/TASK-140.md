@@ -4,6 +4,10 @@ Status: Draft for Approval
 Target repo: frontend `mimico-game`
 Autonomy level: Level 1 - Single Task
 
+## Agent Entry Instructions
+
+Execute this task file directly. Before editing files, read and follow `harness/AGENT-ENTRY-INSTRUCTIONS.md`.
+
 ## Objective
 
 Implement the frontend table setup path for Mimico V1: creating a private table, selecting invitees, accepting or rejecting invites, rendering table player/invite state, table chat, host manual team assignment, readiness, explicit start, and routing players to match setup after `MATCH_STARTED`.
@@ -154,6 +158,7 @@ Stop and ask for review if:
 - mobile layout requirements require broader visual-system work from Wave 6
 - root contracts or backend code need to change
 - video, reconnection, or gameplay state becomes necessary
+
 
 ## Expected Commit / PR Notes
 

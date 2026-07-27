@@ -5,7 +5,7 @@ Date: 2026-07-25
 
 ## Purpose
 
-This document defines the canonical vocabulary and invariants for Mimico V1. Agents must use these terms when writing specs, contracts, tests, tasks, code comments, prompts, and release checklists.
+This document defines the canonical vocabulary and invariants for Mimico V1. Agents must use these terms when writing specs, contracts, tests, tasks, code comments, executable task instructions, and release checklists.
 
 If existing code uses a different name, the canonical product term in this document wins for new documentation. Code changes may keep legacy names temporarily, but new contracts and new user-facing behavior should move toward the canonical vocabulary.
 
@@ -275,7 +275,7 @@ These decisions are accepted and must be carried into `DOMAIN-001`, contracts, s
 
 ## Agent Rules
 
-- Use canonical terms from this document in all new docs and prompts.
+- Use canonical terms from this document in all new docs and executable task instructions.
 - Do not invent new state names without updating this document and `DOMAIN-001`.
 - Do not introduce new event or command names without updating this document and executable contracts.
 - Treat legacy code names as implementation details unless promoted here.

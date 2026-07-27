@@ -4,6 +4,10 @@ Status: Draft for Approval
 Target repo: root `mimico`
 Autonomy level: Level 1 - Single Task
 
+## Agent Entry Instructions
+
+Execute this task file directly. Before editing files, read and follow `harness/AGENT-ENTRY-INSTRUCTIONS.md`.
+
 ## Objective
 
 Create a root contract-expansion planning artifact that identifies the accepted contract gaps blocking Wave 2 through Wave 5 implementation.
@@ -53,7 +57,7 @@ This task prepares the backlog for future contract work. It must not implement b
   - requires Tech Design
   - blocked by accepted-spec conflict
 - Define suggested future task IDs for the actual contract edits if needed.
-- Do not create `TEST-FIRST-*` packs or implementation prompts.
+- Do not create `TEST-FIRST-*` packs or executable task entry instructions for unrelated tasks.
 
 ## Out Of Scope
 
@@ -113,6 +117,7 @@ Stop and ask for review if:
 - a gap requires video/WebRTC architecture rather than contract-only work
 - a schema change would affect both backend and frontend implementation readiness
 - generated clients/types become part of the proposed solution
+
 
 ## Expected Commit / PR Notes
 

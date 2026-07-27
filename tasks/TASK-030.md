@@ -4,6 +4,10 @@ Status: Draft for Approval
 Target repo: backend `api-mimico`
 Autonomy level: Level 1 - Single Task
 
+## Agent Entry Instructions
+
+Execute this task file directly. Before editing files, read and follow `harness/AGENT-ENTRY-INSTRUCTIONS.md`.
+
 ## Objective
 
 Establish the backend repository's baseline verification path before feature implementation begins.
@@ -100,6 +104,7 @@ Stop and ask for review if:
 - CI requires secrets or deploy-provider decisions
 - root contracts need to change
 - frontend changes are needed
+
 
 ## Expected Commit / PR Notes
 

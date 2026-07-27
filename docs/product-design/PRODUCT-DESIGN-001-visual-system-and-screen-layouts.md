@@ -449,7 +449,7 @@ These are not implementation tasks yet; they are future task inputs.
 
 ## Accepted Decisions
 
-These decisions are accepted and must be carried into frontend tasks, visual QA, implementation prompts, and review checklists.
+These decisions are accepted and must be carried into frontend tasks, visual QA, executable task entry instructions, and review checklists.
 
 | ID | Decision |
 | --- | --- |

@@ -9,7 +9,7 @@ Turn the accepted Phase 1 package into an executable implementation graph for Mi
 
 This graph defines execution waves, dependencies, task IDs, target repositories, classifications, source specs, contract dependencies, expected tests, verification commands, acceptance gates, branch/PR strategy, first recommended wave, known risks, and stop conditions.
 
-No individual task files, test-first packs, or implementation prompts are created by this artifact.
+No individual task files, test-first packs, or executable task entry instructions are created by this artifact.
 
 ## Source Documents Read
 
@@ -303,7 +303,7 @@ Recommended execution order inside Wave 1:
 
 ## Acceptance Gates
 
-- No production code starts before this graph, task files, test-first packs, and implementation prompts are separately approved.
+- No production code starts before this graph, task files, test-first packs, and executable task entry instructions are separately approved.
 - Any contract-sensitive implementation task must run the root contract validation command once `TASK-010` exists.
 - Any task changing canonical contracts is `serial`.
 - Any task touching backend and frontend behavior must define separate repo targets, verification commands, and commit/PR expectations.

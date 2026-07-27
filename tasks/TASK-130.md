@@ -4,6 +4,10 @@ Status: Draft for Approval
 Target repo: backend `api-mimico`
 Autonomy level: Level 1 - Single Task
 
+## Agent Entry Instructions
+
+Execute this task file directly. Before editing files, read and follow `harness/AGENT-ENTRY-INSTRUCTIONS.md`.
+
 ## Objective
 
 Implement the backend table setup path for Mimico V1: private table creation, invites, accepted/rejected/expired invite state, table chat, manual team assignment, table readiness, explicit host match start, and pre-match table close/leave behavior.
@@ -145,6 +149,7 @@ Stop and ask for review if:
 - table changes require frontend changes in the same PR
 - active-match reconnection or gameplay behavior becomes necessary
 - root contracts need to change beyond accepted `CONTRACT-GAP-001/002` resolution
+
 
 ## Expected Commit / PR Notes
 

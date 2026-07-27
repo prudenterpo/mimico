@@ -18,7 +18,7 @@ Phase 2 produces:
 - `TASK-GRAPH-001`
 - individual task files
 - test-first packs
-- implementation prompts
+- executable task entry instructions
 - release/review checklist updates when needed
 
 Phase 2 does not directly implement product code unless the user explicitly starts the execution phase after approving planning artifacts.
@@ -55,7 +55,7 @@ Follow this order exactly:
 4. Stop for user approval.
 5. After approval, produce matching `TEST-FIRST-xxx.md` packs.
 6. Stop for user approval.
-7. After approval, produce `PROMPT-xxx.md` files for executor agents.
+7. After approval, make each `TASK-xxx.md` executable by including agent entry instructions for executor agents.
 8. Stop for user approval before any implementation starts.
 
 Do not skip approval checkpoints.
@@ -65,7 +65,7 @@ Do not skip approval checkpoints.
 - Do not implement code during Phase 2 planning.
 - Do not generate individual task files before `TASK-GRAPH-001` is approved.
 - Do not generate test-first packs before task files are approved.
-- Do not generate implementation prompts before test-first packs are approved.
+- Do not mark task entry instructions ready before test-first packs are approved.
 - Do not merge backend, frontend, and root repo concerns into one undifferentiated task.
 - Do not assume missing product behavior; trace behavior to accepted specs.
 - Do not weaken accepted contracts or invariants to make a task easier.
@@ -151,13 +151,12 @@ Each future `TEST-FIRST-xxx.md` must include:
 
 Test-first packs must follow `TEST-STRATEGY-001`.
 
-## Implementation Prompt Requirements
+## Executable Task Entry Requirements
 
-Each future `PROMPT-xxx.md` must be self-contained enough for an executor agent.
+Each future `TASK-xxx.md` must be self-contained enough for an executor agent.
 
 It must include:
 
-- exact task file to execute
 - exact test-first pack to follow
 - required source documents to read
 - repo path
@@ -227,11 +226,11 @@ The planner must stop after:
 - `TASK-GRAPH-001`
 - first batch of task files
 - first batch of test-first packs
-- first batch of implementation prompts
+- first batch of executable task entry instructions
 
 At each checkpoint, the planner should ask for approval, not continue automatically.
 
-## Builder Prompt
+## Builder Instruction
 
 For a new Codex thread, the user can start Phase 2 with:
 
@@ -246,6 +245,6 @@ Phase 2 planning is ready to hand off to executor agents when:
 - `TASK-GRAPH-001` is accepted
 - first execution wave task files are accepted
 - matching test-first packs are accepted
-- matching implementation prompts are accepted
+- matching task entry instructions are accepted
 - repo boundaries and verification commands are explicit
 - parallel-safe tasks are clearly identified

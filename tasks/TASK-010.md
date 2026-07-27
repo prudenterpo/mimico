@@ -4,6 +4,10 @@ Status: Draft for Approval
 Target repo: root `mimico`
 Autonomy level: Level 1 - Single Task
 
+## Agent Entry Instructions
+
+Execute this task file directly. Before editing files, read and follow `harness/AGENT-ENTRY-INSTRUCTIONS.md`.
+
 ## Objective
 
 Implement the first executable harness layer in the root repository: contract validation tooling, sample payload validation, and root CI for contracts.
@@ -106,6 +110,7 @@ Stop and ask for review if:
 - AsyncAPI tooling cannot support the accepted file shape without a design adjustment.
 - Generated clients/types appear necessary.
 - Validation would require backend or frontend code to run.
+
 
 ## Expected Commit / PR Notes
 

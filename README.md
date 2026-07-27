@@ -1,13 +1,13 @@
 # Mimico
 
-Mimico is a full-stack multiplayer browser game project. This root repository is the product and orchestration workspace for planning, specifications, agent prompts, task plans, and delivery checklists.
+Mimico is a full-stack multiplayer browser game project. This root repository is the product and orchestration workspace for planning, specifications, executable task instructions, task plans, and delivery checklists.
 
 ## Repository Layout
 
 - `docs/`: validated product documents and decision records.
 - `specs/`: functional and technical specifications derived from the PRD.
 - `plans/`: implementation plans and task graphs.
-- `harness/`: agent execution prompts, verification checklists, and workflow utilities.
+- `harness/`: agent execution rules, verification checklists, and workflow utilities.
 - `api-mimico/`: backend repository, versioned separately.
 - `mimico-game/`: frontend repository, versioned separately.
 

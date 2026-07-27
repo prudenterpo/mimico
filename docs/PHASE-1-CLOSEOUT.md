@@ -7,7 +7,7 @@ Date: 2026-07-26
 
 This document closes Phase 1 of Mimico V1.
 
-Phase 1 produced the product, domain, contract, functional specification, test strategy, and initial harness design needed before execution planning. It intentionally stops before generating implementation task files, test-first packs, implementation prompts, or agent work packages.
+Phase 1 produced the product, domain, contract, functional specification, test strategy, and initial harness design needed before execution planning. It intentionally stops before generating implementation task files, test-first packs, executable task entry instructions, or agent work packages.
 
 ## Phase Boundary
 
@@ -29,7 +29,7 @@ Phase 1 does not include:
 - executable task graph
 - individual task files
 - test-first implementation packs
-- implementation prompts
+- executable task entry instructions
 - multi-agent execution plan
 - production deploy
 - code implementation
@@ -76,7 +76,7 @@ Phase 2 should update `HARNESS-001` only when:
 - Visual system and screen layout direction are accepted as V1 quality bar, not post-MVP polish.
 - Additional Tech Designs should be created only when the task graph identifies a risky technical area.
 - Root contract validation and CI are the first executable harness implementation target.
-- Task graph, task files, test-first packs, and prompts belong to Phase 2.
+- Task graph, task files, test-first packs, and executable task entry instructions belong to Phase 2.
 
 ## Recommended Phase 2 Start
 
