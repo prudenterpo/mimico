@@ -122,10 +122,23 @@ Planning artifacts exist and are in root PR [prudenterpo/mimico#1](https://githu
 
 ## Wave 3 - Core Gameplay Without Video Architecture
 
-- `[ ]` `TASK-210` - Backend gameplay persistence/state Tech Design
+- `[>]` `TASK-210` - Backend gameplay persistence/state Tech Design
+  - Repo: root `mimico`
+  - Artifact: `docs/tech-design/TECH-DESIGN-002-backend-gameplay-persistence.md`
+  - Task: `tasks/TASK-210.md`
+  - Branch: `feature/task-210-gameplay-tech-design`
+  - PR: [prudenterpo/mimico#12](https://github.com/prudenterpo/mimico/pull/12)
+  - Notes: defines match state persistence, round timer freeze/resume, reconnection recovery payload, deterministic fixture interfaces, word card delivery, and contract gaps (CONTRACT-GAP-003/004).
+  - Depends on: `TASK-130`
+
 - `[ ]` `TASK-220` - Backend gameplay state machine and commands
+  - Depends on: accepted `TASK-210` Tech Design
+
 - `[ ]` `TASK-230` - Frontend authoritative gameplay UI and state client
+  - Depends on: accepted `TASK-210` Tech Design
+
 - `[ ]` `TASK-240` - Deterministic word, dice, timer fixtures for tests
+  - Depends on: accepted `TASK-210` Tech Design
 
 ## Wave 4 - Reconnection And Recovery
 

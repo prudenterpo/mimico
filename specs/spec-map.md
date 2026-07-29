@@ -59,6 +59,7 @@ This map defines the documentation system for Mimico V1. It keeps the PRD, domai
 | ID | Document | Status | Purpose |
 | --- | --- | --- | --- |
 | `TECH-DESIGN-001` | Contract Validation and CI | Accepted | Defines root contract validation tooling, CI topology, and follow-up CI responsibilities across repos. |
+| `TECH-DESIGN-002` | Backend Gameplay Persistence and State Architecture | Draft | Defines match state persistence, timer freeze/resume, reconnection recovery, deterministic fixtures, and contract gaps for gameplay. |
 
 ## Planned Contract Readiness Artifacts
 
