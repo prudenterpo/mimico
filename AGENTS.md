@@ -1,28 +1,67 @@
-# Agent Instructions - Mimico Root
+# Agent Instructions — Mimico
 
-This root repository is for product orchestration only. It owns PRDs, specs, plans, tasks, prompts, and delivery checklists.
+Mimico consists of this product repository and two independent application
+repositories: `api-mimico/` and `mimico-game/`.
 
-## Repository Boundaries
+## Sources of truth
 
-- Do not edit `api-mimico/` from a root-repo documentation task unless the user explicitly asks for implementation work.
-- Do not edit `mimico-game/` from a root-repo documentation task unless the user explicitly asks for implementation work.
-- Treat `api-mimico/` and `mimico-game/` as independent Git repositories with their own remotes.
-- Commit root documentation changes in this repository.
-- Commit backend changes from inside `api-mimico/`.
-- Commit frontend changes from inside `mimico-game/`.
+- Product behavior and scope: `docs/spec-kit/PRD.md`.
+- Stable delivery rules: `docs/spec-kit/CONSTITUTION.md`.
+- Cross-repository architecture: `docs/spec-kit/TECHNICAL-DESIGN.md`.
+- Verified implementation baseline: `docs/spec-kit/INVENTORY.md`.
+- Stable remaining delivery map: `docs/spec-kit/LEDGER.md`.
+- Implemented behavior: code, tests, migrations, generated contracts, Git, and
+  CI in the owning application repository.
 
-## Product Workflow
+Before analysis, planning, or implementation, run `git fetch` in both nested
+repositories and inspect `origin/develop`. Local branches may be intentionally
+behind. Do not check them out or modify their working trees merely to inspect
+the current implementation.
 
-- Use `docs/prd-v1.md` as the source of truth for Mimico V1.
-- Use `docs/adr/ADR-001-ai-assisted-sdd-workflow.md` as the source of truth for the AI-assisted SDD workflow.
-- Use `specs/spec-map.md` to understand the current documentation graph before creating new specs or tasks.
-- Do not treat old PDFs or loose notes as requirements unless they are explicitly promoted into a current spec.
-- Before implementation, derive tasks from a validated spec and include acceptance criteria plus required verification.
-- Keep specs organized by product capability or user flow, not by frontend/backend layer.
-- Include frontend, backend, contracts, states, and tests inside each relevant spec when the feature crosses layers.
+## Behavior-driven delivery
 
-## Documentation Style
+- Start from an observable user or system behavior, not a frontend/backend task
+  list.
+- Write only the acceptance examples needed to remove ambiguity.
+- Prefer Given/When/Then for rules with meaningful state transitions; use plain
+  acceptance bullets when they are clearer.
+- Turn each accepted example into an automated test at the cheapest layer that
+  can prove it.
+- A cross-layer behavior is incomplete until the integrated path is verified.
+- Do not maintain separate test-first packs, prompt files, handoffs, task graphs,
+  or execution-status documents.
 
-- Prefer concise Markdown with explicit decisions, open questions, acceptance criteria, and verification steps.
-- Use stable IDs for decisions, specs, and tasks once created.
-- Keep generated plans small enough for agents to execute without guessing.
+## Workstreams
+
+A workstream is one large implementation task for a bounded product outcome.
+It may span root documentation, backend, frontend, infrastructure, and several
+pull requests. Create
+`docs/spec-kit/WORKSTREAM-<name>.md` naturally in the same branch as the first
+implementation change. It contains scope, behavior examples, decisions, risks,
+and completion evidence. GitHub owns branches, pull requests, checks, ownership,
+and live status; never copy that lifecycle into versioned documents.
+
+Do not decompose the workstream into versioned microtask files. The workstream
+owner may delegate investigations, implementation areas, and checks internally,
+but remains accountable for the integrated outcome. Split into another
+workstream only for an independently valuable outcome, a separate production
+authorization, or an unsafe repository/rollback boundary.
+
+## Repository boundaries
+
+- Root documentation changes are committed in this repository.
+- Backend implementation is committed from `api-mimico/`.
+- Frontend implementation is committed from `mimico-game/`.
+- Do not edit either application during a root documentation-only task unless
+  implementation was explicitly requested.
+- Preserve user changes and untracked local configuration.
+
+## Documentation discipline
+
+- Keep the artifact set small and remove duplication instead of adding indexes.
+- Product rules belong in the PRD; technical choices belong in Technical Design;
+  verified implementation facts belong in Inventory.
+- Update durable decisions in the same pull request as the code that depends on
+  them.
+- Historical notes and old PDFs are evidence, not requirements.
+- Write repository and Git-hosting artifacts in English.
