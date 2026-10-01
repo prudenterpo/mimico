@@ -118,10 +118,12 @@ failure must be distinguishable from network disconnection.
 
 ## Video target
 
-PeerJS remains the preferred V1 client abstraction unless implementation
-evidence shows it cannot meet the four-player behavior. The backend provides
-authenticated signaling coordination over the existing real-time channel or a
-separately justified signaling service.
+Authenticated signaling uses the existing STOMP channel and match membership.
+The public PeerJS broker is not used: PeerJS media negotiation requires that
+broker, so it cannot enforce match membership or keep session descriptions off
+a third party. The browser session is an `RTCPeerConnection` mesh. The `peerjs`
+package may remain installed, but application code must not open a third-party
+media socket.
 
 V1 requires:
 
