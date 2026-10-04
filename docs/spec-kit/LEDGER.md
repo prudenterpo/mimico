@@ -38,18 +38,15 @@ This task owns all behavior required to close the functional product:
 - concurrent and repeated-command probes;
 - backend, frontend, integration, and multi-browser automated evidence.
 
-Expected vertical order:
+Remaining verticals live in `WORKSTREAM-complete-multiplayer.md`:
 
-1. freeze behavior examples and inspect current contracts;
-2. implement authenticated signaling and media lifecycle;
-3. connect media failure to match pause/recovery;
-4. build the real four-client harness and deterministic fixtures;
-5. close contract, privacy, concurrency, and rematch gaps found by E2E;
-6. run the complete behavior suite and integrated review.
+1. unblock the table on PostgreSQL (`api-mimico`);
+2. first live round: sorteio, dice, card, guess;
+3. close the match: steal, timeout, reconnect, rematch;
+4. four-browser harness against PostgreSQL and Redis.
 
-Safe parallel areas include backend signaling, frontend media primitives, and
-E2E environment scaffolding. The gameplay store, STOMP adapter, WebSocket
-configuration, and shared envelopes each have one owner at a time.
+A before B. C and D after B. Do not open product-quality or release
+workstreams until B has been played.
 
 Completion: the full V1 functional flow passes with four controlled browsers
 against PostgreSQL and Redis, including real or browser-provided test media. No
