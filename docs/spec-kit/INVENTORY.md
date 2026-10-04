@@ -2,21 +2,23 @@
 
 ## Evidence baseline
 
-This inventory was refreshed on 2026-09-26 after fetching both application
-repositories. It records a point-in-time navigation baseline, not live status.
-Always refresh `origin/develop` before relying on it.
+This inventory was refreshed on 2026-10-04 after fetching both application
+repositories and running one local PostgreSQL + Redis four-browser smoke. It
+records a point-in-time navigation baseline, not live status. Always refresh
+`origin/develop` before relying on it.
 
 | Repository | Baseline | Evidence |
 |---|---|---|
-| `api-mimico` | `0514c42` on `origin/develop` | “Implement Wave 3 gameplay state machine.” |
+| `api-mimico` | `c7c845f` on `origin/develop` | “Add authenticated match signaling and mime media pause.” |
 | `mimico-game` | `175822e` on `origin/develop` | “Restore paused matches from the server.” |
 
-The nested local checkouts were behind these refs and were not used as the
-current implementation source.
+`origin/develop` is the implementation baseline. A later unmerged frontend
+branch and local backend patches were used only for the integrated smoke
+described below. They are not the current application baseline.
 
 ## Backend capabilities
 
-Verified from `api-mimico@0514c42`:
+Verified from `api-mimico@c7c845f`:
 
 - registration, login, logout, authenticated profile;
 - lobby presence and chat over WebSocket;
@@ -31,9 +33,12 @@ Verified from `api-mimico@0514c42`:
 - persisted pause metadata and 60-second reconnection behavior;
 - deterministic dice, timer, and word-selection seams for tests;
 - per-match command locking and retry support;
-- state, private-card, and match-end event publication.
+- state, private-card, and match-end event publication;
+- authenticated match signaling (`OFFER`, `ANSWER`, `CANDIDATE`, `JOIN`,
+  `LEAVE`) on `/app/match/{matchId}/signal`;
+- mime media unavailable/available commands and `MIME_MEDIA_FAILED` pause.
 
-The branch contains 97 JUnit `@Test` declarations. This count is navigation
+The branch contains 111 JUnit `@Test` declarations. This count is navigation
 evidence only; the suite result must be checked in CI or a clean compatible
 environment before delivery.
 
@@ -52,26 +57,65 @@ Verified from `mimico-game@175822e`:
 The branch contains 38 frontend test declarations. As with the backend count,
 this does not replace a clean test/build result.
 
-## Gaps confirmed by code inspection
+Video UI is not on `origin/develop`. It exists on the unmerged frontend branch
+`feature/frontend-media-session-462b` (`fdc5050`): a separate media store, an
+`RTCPeerConnection` mesh over the existing STOMP connection, permission and
+mime-media reporting, and game-page tiles. Application code on that branch does
+not open a PeerJS socket.
 
-### Video is not implemented end to end
+## Integrated four-browser smoke (2026-10-04)
 
-- `src/lib/peer.ts` exists in the frontend but has no consumer in the current
-  gameplay flow.
-- The backend has no WebRTC signaling command, topic, or service.
-- The gameplay page does not render real local or remote media streams.
-- Permission denial, peer failure, ICE failure, cleanup, and media-driven pause
-  are not proven.
+Four isolated Chromium profiles ran against PostgreSQL 16, Redis 7, the local
+backend, and the unmerged frontend media branch.
 
-### Integrated proof is missing
+What passed after local backend patches:
 
-- No four-browser E2E harness proves a complete match.
-- Backend and frontend tests do not by themselves prove STOMP destination and
-  payload compatibility in a running environment.
-- Rematch presentation exists, but a complete second match with the same four
-  clients is not proven.
-- PostgreSQL migration and gameplay concurrency require a production-shaped
-  integration check; H2-based context tests are insufficient evidence.
+- four users registered and logged in;
+- the host saw the other three online and created one table;
+- the three guests received the invite toast and accepted;
+- the host assigned two players per team and started the match;
+- all four browsers opened the same game URL;
+- four labeled video tiles appeared with browser fake-camera streams;
+- the host reached the initial-roll selector; guests waited for that choice.
+
+What that smoke did not prove:
+
+- a complete match through natural victory;
+- normal guess, special steal, timeout, abandonment, rematch;
+- disconnect and reconnect without closing the browsers;
+- TURN, real cameras, or a repository-owned four-browser harness.
+
+## Gaps confirmed by inspection and the smoke
+
+### Video is not on the frontend baseline
+
+- `origin/develop` still has unused `src/lib/peer.ts` and no game-page media.
+- The backend signaling contract is on `origin/develop`; the consumer is not.
+- Permission denial, ICE failure, cleanup, and media-driven pause are not
+  proven on the merged frontend.
+
+### Producer defects block a real four-player table
+
+A PostgreSQL run against current `origin/develop` code failed before invites
+could be delivered. H2 tests did not catch these:
+
+- `TableController` is mapped at `/tables` while the frontend calls
+  `/api/tables`;
+- `game_tables_status_check` still allows only `WAITING`, `IN_PROGRESS`, and
+  `FINISHED`, so inserting `TABLE_WAITING` fails;
+- `sendInvite` reads the lazy `GameTableEntity.host` after the persistence
+  session closed, so Redis recorded pending invites but STOMP never delivered
+  `TABLE_INVITE_RECEIVED`.
+
+Those three fixes exist only as a local `api-mimico` branch
+`feature/api-tables-path-075d`. They are not on `origin/develop`.
+
+### Integrated harness is still missing
+
+- No repository Playwright (or equivalent) four-browser suite exists.
+- Rematch with the same four clients is not proven.
+- A Next.js runtime overlay (“1 issue”) appeared on table and game pages
+  during the smoke and is unresolved.
 
 ### Release readiness is unproven
 
