@@ -40,11 +40,12 @@ This task owns all behavior required to close the functional product:
 
 Remaining verticals live in `WORKSTREAM-complete-multiplayer.md`:
 
-1. unblock the table on PostgreSQL (`api-mimico`);
+1. **A — unblock the table** on PostgreSQL (`api-mimico`, fresh agent);
 2. first live round: sorteio, dice, card, guess;
 3. close the match: steal, timeout, reconnect, rematch;
 4. four-browser harness against PostgreSQL and Redis.
 
+Start A in a new cloud agent on `prudenterpo/api-mimico` from `origin/develop`.
 A before B. C and D after B. Do not open product-quality or release
 workstreams until B has been played.
 

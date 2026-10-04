@@ -168,8 +168,10 @@ Land the three PostgreSQL defects that stop four people from sitting down:
   values;
 - invite delivery without a lazy `GameTableEntity.host` read.
 
-One backend PR. Local branch `feature/api-tables-path-075d` already has this.
-Nothing else starts on a clean `develop` until this merges.
+One backend PR on `api-mimico` from `origin/develop`. Open a fresh agent in
+that repository. Do not continue this from the product-repo thread: that
+token cannot push `api-mimico`. Nothing else starts on a clean `develop`
+until this merges.
 
 ### B — First live round (`mimico-game` + patched API)
 
