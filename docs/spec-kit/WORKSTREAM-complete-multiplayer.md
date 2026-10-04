@@ -154,36 +154,46 @@ And the mime player's video is visually primary
 And leaving the page stops the local tracks
 ```
 
-## Verticals
+## Remaining verticals
 
-1. Freeze the examples above and the signaling contract. This document.
-2. Backend signaling plus media pause and resume, with service tests.
-3. Frontend media session, permission and failure states, and game-page wiring.
-4. Four-browser harness scaffold with fake media devices.
-5. Contract, privacy, concurrency, and rematch gaps found when the harness runs
-   against PostgreSQL and Redis.
-6. Full behavior suite and integrated review.
+Signaling, media pause, and the media-session code already exist. The remaining
+work is four large slices. Do not split them into task files.
 
-Verticals 2, 3, and 4 may proceed in parallel on the branches named in the
-pull requests. Vertical 5 starts after those three agree on the contract.
+### A — Unblock the table (`api-mimico`)
 
-## Integrated findings
+Land the three PostgreSQL defects that stop four people from sitting down:
 
-A PostgreSQL + Redis four-browser smoke on 2026-10-04 showed three producer
-defects that H2 unit tests did not catch. They must land on `api-mimico`
-before the harness vertical can pass against a real database:
+- HTTP tables at `/api/tables`;
+- Flyway V13: `game_tables.status` as `VARCHAR(32)` with the five `TABLE_*`
+  values;
+- invite delivery without a lazy `GameTableEntity.host` read.
 
-1. Table HTTP routes must be `/api/tables` to match the frontend client.
-2. `game_tables.status` must be `VARCHAR(32)` and accept the five `TABLE_*`
-   lifecycle values. Flyway V9 still allows only `WAITING`, `IN_PROGRESS`,
-   and `FINISHED`.
-3. Invite delivery must not read the lazy `GameTableEntity.host` outside a
-   persistence session. Pending invites were stored, but
-   `TABLE_INVITE_RECEIVED` was not sent.
+One backend PR on `api-mimico` from `origin/develop`. Open a fresh agent in
+that repository. Do not continue this from the product-repo thread: that
+token cannot push `api-mimico`. Nothing else starts on a clean `develop`
+until this merges.
 
-With those patches and the unmerged frontend media branch, four Chromium
-clients reached one match, rendered four fake-camera tiles, and stopped at
-the host initial-roll selector. That is not workstream completion.
+### B — First live round (`mimico-game` + patched API)
+
+Four browsers finish one turn: initial roll, dice, private card, one correct
+guess. Merge the open media PR and the board-track branch. Fix only what
+blocks that path. Keep all four clients connected so a disconnect pause does
+not abort the playtest.
+
+Word catalog stays as-is. Difficulty is unused; do not expand the seed here.
+
+### C — Close the match (both apps)
+
+Same four clients through steal, timeout, disconnect/reconnect, mime-media
+pause, abandonment, natural win, and rematch. Change rules or contracts only
+when the live path proves a gap.
+
+### D — Four-browser harness (`mimico-game`)
+
+Automate B and C against PostgreSQL and Redis with fake cameras. Scaffold may
+start after A. It does not close the workstream without a passing live path.
+
+Order: A, then B. C and D after B; D scaffolding may overlap C.
 
 ## Risks
 
@@ -205,5 +215,5 @@ Production deployment is out of scope.
 
 ## Rollback
 
-Revert the signaling and media branches independently. No schema migration is
-part of the first verticals, so a database rollback is not required for them.
+Revert each vertical independently. Vertical A includes Flyway V13; roll that
+back with the backend PR if needed. B–D add no schema.
