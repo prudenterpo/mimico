@@ -167,6 +167,24 @@ And leaving the page stops the local tracks
 Verticals 2, 3, and 4 may proceed in parallel on the branches named in the
 pull requests. Vertical 5 starts after those three agree on the contract.
 
+## Integrated findings
+
+A PostgreSQL + Redis four-browser smoke on 2026-10-04 showed three producer
+defects that H2 unit tests did not catch. They must land on `api-mimico`
+before the harness vertical can pass against a real database:
+
+1. Table HTTP routes must be `/api/tables` to match the frontend client.
+2. `game_tables.status` must be `VARCHAR(32)` and accept the five `TABLE_*`
+   lifecycle values. Flyway V9 still allows only `WAITING`, `IN_PROGRESS`,
+   and `FINISHED`.
+3. Invite delivery must not read the lazy `GameTableEntity.host` outside a
+   persistence session. Pending invites were stored, but
+   `TABLE_INVITE_RECEIVED` was not sent.
+
+With those patches and the unmerged frontend media branch, four Chromium
+clients reached one match, rendered four fake-camera tiles, and stopped at
+the host initial-roll selector. That is not workstream completion.
+
 ## Risks
 
 - A disconnect that arrives during a media pause must not erase the remaining
