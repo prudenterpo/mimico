@@ -1,0 +1,442 @@
+From e546a66d1825a33b32cca934a4948364f94c1da1 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Sun, 4 Oct 2026 19:25:22 +0000
+Subject: [PATCH 1/2] Fix table HTTP path, Postgres status check, and invite
+ host lookup.
+
+POST /api/tables now matches the frontend client. Flyway V13 widens
+game_tables.status and accepts the TABLE_* lifecycle values that H2
+never enforced. sendInvite keeps a persistence session and reads the
+host nickname from userRepository so TABLE_INVITE_RECEIVED reaches the
+guest.
+---
+ .../mimico/controllers/TableController.java   |   2 +-
+ .../mimico/services/TablePlayerService.java   |   6 +-
+ .../V13__game_table_status_lifecycle.sql      |  25 ++++
+ .../controllers/TableControllerTest.java      | 130 ++++++++++++++++++
+ .../services/TablePlayerServiceTest.java      |  31 +++++
+ 5 files changed, 192 insertions(+), 2 deletions(-)
+ create mode 100644 src/main/resources/db/migration/V13__game_table_status_lifecycle.sql
+ create mode 100644 src/test/java/com/rpo/mimico/controllers/TableControllerTest.java
+
+diff --git a/src/main/java/com/rpo/mimico/controllers/TableController.java b/src/main/java/com/rpo/mimico/controllers/TableController.java
+index 7e662cb..b91db5b 100644
+--- a/src/main/java/com/rpo/mimico/controllers/TableController.java
++++ b/src/main/java/com/rpo/mimico/controllers/TableController.java
+@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
+ import java.util.UUID;
+ 
+ @RestController
+-@RequestMapping("/tables")
++@RequestMapping("/api/tables")
+ @RequiredArgsConstructor
+ @Tag(name = "Tables", description = "Game table management")
+ @SecurityRequirement(name = "bearer-jwt")
+diff --git a/src/main/java/com/rpo/mimico/services/TablePlayerService.java b/src/main/java/com/rpo/mimico/services/TablePlayerService.java
+index b2e3938..3eb3bf3 100644
+--- a/src/main/java/com/rpo/mimico/services/TablePlayerService.java
++++ b/src/main/java/com/rpo/mimico/services/TablePlayerService.java
+@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
+ import org.springframework.data.redis.core.StringRedisTemplate;
+ import org.springframework.messaging.simp.SimpMessagingTemplate;
+ import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
+ 
+ import java.time.Duration;
+ import java.time.OffsetDateTime;
+@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
+ @Slf4j
+ @Service
+ @RequiredArgsConstructor
++@Transactional
+ public class TablePlayerService {
+ 
+     private static final String TABLE_ACCEPTED_KEY_TEMPLATE = "table:%s:accepted";
+@@ -77,6 +79,8 @@ public class TablePlayerService {
+ 
+         UserEntity invitedUser = userRepository.findById(invitedUserId)
+                 .orElseThrow(() -> new IllegalArgumentException("Invited user not found"));
++        UserEntity host = userRepository.findById(hostUserId)
++                .orElseThrow(() -> new IllegalArgumentException("Host user not found"));
+         UUID inviteId = inviteService.createInvite(tableId, invitedUserId, hostUserId);
+         redisTemplate.opsForSet().add(invitedKey(tableId), invitedUserId.toString());
+         redisTemplate.expire(invitedKey(tableId), Duration.ofHours(TABLE_TTL_HOURS));
+@@ -86,7 +90,7 @@ public class TablePlayerService {
+                 .tableId(tableId)
+                 .tableName(table.getName())
+                 .hostId(hostUserId)
+-                .hostDisplayName(table.getHost().getNickname())
++                .hostDisplayName(host.getNickname())
+                 .invitedUserId(invitedUser.getId())
+                 .expiresIn((int) inviteService.inviteTimeoutSeconds())
+                 .build();
+diff --git a/src/main/resources/db/migration/V13__game_table_status_lifecycle.sql b/src/main/resources/db/migration/V13__game_table_status_lifecycle.sql
+new file mode 100644
+index 0000000..ebfa1f1
+--- /dev/null
++++ b/src/main/resources/db/migration/V13__game_table_status_lifecycle.sql
+@@ -0,0 +1,25 @@
++ALTER TABLE game_tables DROP CONSTRAINT IF EXISTS game_tables_status_check;
++
++ALTER TABLE game_tables
++    ALTER COLUMN status TYPE VARCHAR(32);
++
++UPDATE game_tables
++SET status = CASE status
++    WHEN 'WAITING' THEN 'TABLE_WAITING'
++    WHEN 'waiting' THEN 'TABLE_WAITING'
++    WHEN 'IN_PROGRESS' THEN 'TABLE_IN_MATCH'
++    WHEN 'in_progress' THEN 'TABLE_IN_MATCH'
++    WHEN 'FINISHED' THEN 'TABLE_CLOSED'
++    WHEN 'finished' THEN 'TABLE_CLOSED'
++    ELSE status
++END;
++
++ALTER TABLE game_tables
++    ADD CONSTRAINT game_tables_status_check
++        CHECK (status IN (
++            'TABLE_WAITING',
++            'TABLE_READY_TO_START',
++            'TABLE_IN_MATCH',
++            'TABLE_BETWEEN_MATCHES',
++            'TABLE_CLOSED'
++        ));
+diff --git a/src/test/java/com/rpo/mimico/controllers/TableControllerTest.java b/src/test/java/com/rpo/mimico/controllers/TableControllerTest.java
+new file mode 100644
+index 0000000..152e889
+--- /dev/null
++++ b/src/test/java/com/rpo/mimico/controllers/TableControllerTest.java
+@@ -0,0 +1,130 @@
++package com.rpo.mimico.controllers;
++
++import com.fasterxml.jackson.databind.ObjectMapper;
++import com.fasterxml.jackson.databind.SerializationFeature;
++import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
++import com.rpo.mimico.dtos.CreateTableRequestDTO;
++import com.rpo.mimico.dtos.TableResponseDTO;
++import com.rpo.mimico.exceptions.GlobalExceptionHandler;
++import com.rpo.mimico.services.TableService;
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.extension.ExtendWith;
++import org.mockito.ArgumentCaptor;
++import org.mockito.Mock;
++import org.mockito.junit.jupiter.MockitoExtension;
++import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
++import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
++import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
++import org.springframework.test.web.servlet.MockMvc;
++import org.springframework.test.web.servlet.setup.MockMvcBuilders;
++
++import java.time.LocalDateTime;
++import java.util.List;
++import java.util.Map;
++import java.util.UUID;
++
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.mockito.ArgumentMatchers.any;
++import static org.mockito.ArgumentMatchers.eq;
++import static org.mockito.Mockito.verify;
++import static org.mockito.Mockito.verifyNoInteractions;
++import static org.mockito.Mockito.when;
++import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
++import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
++import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
++import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
++
++@ExtendWith(MockitoExtension.class)
++class TableControllerTest {
++
++    @Mock
++    private TableService tableService;
++
++    private MockMvc mockMvc;
++    private ObjectMapper objectMapper;
++
++    @BeforeEach
++    void setUp() {
++        objectMapper = new ObjectMapper();
++        objectMapper.registerModule(new JavaTimeModule());
++        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
++        mockMvc = MockMvcBuilders
++                .standaloneSetup(new TableController(tableService))
++                .setControllerAdvice(new GlobalExceptionHandler())
++                .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
++                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
++                .build();
++    }
++
++    @Test
++    void createTableIsMappedAtApiTables() throws Exception {
++        UUID hostUserId = UUID.randomUUID();
++        UUID tableId = UUID.randomUUID();
++        when(tableService.createTable(eq(hostUserId), any(CreateTableRequestDTO.class)))
++                .thenReturn(tableResponse(tableId, hostUserId, "Mesa V1"));
++
++        mockMvc.perform(post("/api/tables")
++                        .principal(new UsernamePasswordAuthenticationToken(hostUserId.toString(), null))
++                        .contentType("application/json")
++                        .content(objectMapper.writeValueAsString(Map.of("name", "Mesa V1"))))
++                .andExpect(status().isCreated())
++                .andExpect(jsonPath("$.tableId").value(tableId.toString()))
++                .andExpect(jsonPath("$.name").value("Mesa V1"))
++                .andExpect(jsonPath("$.hostUserId").value(hostUserId.toString()))
++                .andExpect(jsonPath("$.status").value("TABLE_WAITING"));
++
++        ArgumentCaptor<CreateTableRequestDTO> requestCaptor = ArgumentCaptor.forClass(CreateTableRequestDTO.class);
++        verify(tableService).createTable(eq(hostUserId), requestCaptor.capture());
++        assertEquals("Mesa V1", requestCaptor.getValue().name());
++    }
++
++    @Test
++    void createTableOnLegacyTablesPathIsNotMapped() throws Exception {
++        mockMvc.perform(post("/tables")
++                        .principal(new UsernamePasswordAuthenticationToken(UUID.randomUUID().toString(), null))
++                        .contentType("application/json")
++                        .content(objectMapper.writeValueAsString(Map.of("name", "Mesa V1"))))
++                .andExpect(status().isNotFound());
++
++        verifyNoInteractions(tableService);
++    }
++
++    @Test
++    void getTableIsMappedAtApiTables() throws Exception {
++        UUID hostUserId = UUID.randomUUID();
++        UUID tableId = UUID.randomUUID();
++        when(tableService.getTable(tableId, hostUserId)).thenReturn(tableResponse(tableId, hostUserId, "Mesa V1"));
++
++        mockMvc.perform(get("/api/tables/{tableId}", tableId)
++                        .principal(new UsernamePasswordAuthenticationToken(hostUserId.toString(), null)))
++                .andExpect(status().isOk())
++                .andExpect(jsonPath("$.tableId").value(tableId.toString()))
++                .andExpect(jsonPath("$.status").value("TABLE_WAITING"));
++    }
++
++    @Test
++    void createTableRejectsBlankName() throws Exception {
++        mockMvc.perform(post("/api/tables")
++                        .principal(new UsernamePasswordAuthenticationToken(UUID.randomUUID().toString(), null))
++                        .contentType("application/json")
++                        .content(objectMapper.writeValueAsString(Map.of("name", " "))))
++                .andExpect(status().isBadRequest())
++                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
++
++        verifyNoInteractions(tableService);
++    }
++
++    private TableResponseDTO tableResponse(UUID tableId, UUID hostUserId, String name) {
++        return TableResponseDTO.builder()
++                .tableId(tableId)
++                .name(name)
++                .hostUserId(hostUserId)
++                .hostNickname("host_1")
++                .status("TABLE_WAITING")
++                .players(List.of())
++                .teamAssignments(List.of())
++                .createdAt(LocalDateTime.of(2026, 10, 4, 12, 0))
++                .build();
++    }
++}
+diff --git a/src/test/java/com/rpo/mimico/services/TablePlayerServiceTest.java b/src/test/java/com/rpo/mimico/services/TablePlayerServiceTest.java
+index add9bee..e797150 100644
+--- a/src/test/java/com/rpo/mimico/services/TablePlayerServiceTest.java
++++ b/src/test/java/com/rpo/mimico/services/TablePlayerServiceTest.java
+@@ -1,5 +1,6 @@
+ package com.rpo.mimico.services;
+ 
++import com.rpo.mimico.dtos.InviteResponseDTO;
+ import com.rpo.mimico.dtos.MatchResponseDTO;
+ import com.rpo.mimico.dtos.RealtimeEventEnvelopeDTO;
+ import com.rpo.mimico.dtos.TeamAssignmentDTO;
+@@ -162,6 +163,36 @@ class TablePlayerServiceTest {
+         service.initializeTableRedis(tableId, host.getId());
+     }
+ 
++    @Test
++    void sendInvitePublishesReceivedEnvelopeWithHostNicknameFromUserRepository() {
++        UserEntity tableHostProxy = user(host.getId(), "lazy_host_must_not_be_read");
++        table.setHost(tableHostProxy);
++        UUID inviteId = UUID.randomUUID();
++        when(inviteService.createInvite(tableId, player2.getId(), host.getId())).thenReturn(inviteId);
++        when(inviteService.inviteTimeoutSeconds()).thenReturn(90L);
++
++        service.sendInvite(tableId, host.getId(), player2.getId());
++
++        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
++        verify(messagingTemplate).convertAndSendToUser(
++                eq(player2.getId().toString()),
++                eq("/queue/invite"),
++                captor.capture()
++        );
++        RealtimeEventEnvelopeDTO<?> envelope = assertEnvelope(captor.getValue());
++        assertEquals("TABLE_INVITE_RECEIVED", envelope.type());
++        assertInstanceOf(InviteResponseDTO.class, envelope.data());
++        InviteResponseDTO invite = (InviteResponseDTO) envelope.data();
++        assertEquals(inviteId, invite.inviteId());
++        assertEquals(tableId, invite.tableId());
++        assertEquals("Mesa V1", invite.tableName());
++        assertEquals(host.getId(), invite.hostId());
++        assertEquals("host_1", invite.hostDisplayName());
++        assertEquals(player2.getId(), invite.invitedUserId());
++        assertEquals(90, invite.expiresIn());
++        assertTrue(sets.get(invitedKey()).contains(player2.getId().toString()));
++    }
++
+     @Test
+     void sendInviteRejectsSelfDuplicateAndTooManyInvites() {
+         assertThrows(IllegalArgumentException.class, () -> service.sendInvite(tableId, host.getId(), host.getId()));
+-- 
+2.43.0
+
+
+From d24d376f035a2c852ebebeb09f7bb7422f599696 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Sun, 4 Oct 2026 19:28:06 +0000
+Subject: [PATCH 2/2] Harden TableControllerTest for /api/tables mapping.
+
+Standalone MockMvc needs a SecurityContext principal so
+@AuthenticationPrincipal resolves, and the mapping assertion
+covers the frontend path without relying on DispatcherServlet 404.
+---
+ .../controllers/TableControllerTest.java      | 82 ++++++++++++-------
+ 1 file changed, 51 insertions(+), 31 deletions(-)
+
+diff --git a/src/test/java/com/rpo/mimico/controllers/TableControllerTest.java b/src/test/java/com/rpo/mimico/controllers/TableControllerTest.java
+index 152e889..777f6ad 100644
+--- a/src/test/java/com/rpo/mimico/controllers/TableControllerTest.java
++++ b/src/test/java/com/rpo/mimico/controllers/TableControllerTest.java
+@@ -15,15 +15,18 @@ import org.mockito.Mock;
+ import org.mockito.junit.jupiter.MockitoExtension;
+ import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+ import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
++import org.springframework.security.core.context.SecurityContextHolder;
+ import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
+ import org.springframework.test.web.servlet.MockMvc;
+ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
++import org.springframework.web.bind.annotation.RequestMapping;
+ 
+ import java.time.LocalDateTime;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.UUID;
+ 
++import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+ import static org.junit.jupiter.api.Assertions.assertEquals;
+ import static org.mockito.ArgumentMatchers.any;
+ import static org.mockito.ArgumentMatchers.eq;
+@@ -57,6 +60,12 @@ class TableControllerTest {
+                 .build();
+     }
+ 
++    @Test
++    void tableControllerIsMappedAtApiTables() {
++        RequestMapping mapping = TableController.class.getAnnotation(RequestMapping.class);
++        assertArrayEquals(new String[]{"/api/tables"}, mapping.value());
++    }
++
+     @Test
+     void createTableIsMappedAtApiTables() throws Exception {
+         UUID hostUserId = UUID.randomUUID();
+@@ -64,57 +73,68 @@ class TableControllerTest {
+         when(tableService.createTable(eq(hostUserId), any(CreateTableRequestDTO.class)))
+                 .thenReturn(tableResponse(tableId, hostUserId, "Mesa V1"));
+ 
+-        mockMvc.perform(post("/api/tables")
+-                        .principal(new UsernamePasswordAuthenticationToken(hostUserId.toString(), null))
+-                        .contentType("application/json")
+-                        .content(objectMapper.writeValueAsString(Map.of("name", "Mesa V1"))))
+-                .andExpect(status().isCreated())
+-                .andExpect(jsonPath("$.tableId").value(tableId.toString()))
+-                .andExpect(jsonPath("$.name").value("Mesa V1"))
+-                .andExpect(jsonPath("$.hostUserId").value(hostUserId.toString()))
+-                .andExpect(jsonPath("$.status").value("TABLE_WAITING"));
++        authenticate(hostUserId);
++        try {
++            mockMvc.perform(post("/api/tables")
++                            .principal(authentication(hostUserId))
++                            .contentType("application/json")
++                            .content(objectMapper.writeValueAsString(Map.of("name", "Mesa V1"))))
++                    .andExpect(status().isCreated())
++                    .andExpect(jsonPath("$.tableId").value(tableId.toString()))
++                    .andExpect(jsonPath("$.name").value("Mesa V1"))
++                    .andExpect(jsonPath("$.hostUserId").value(hostUserId.toString()))
++                    .andExpect(jsonPath("$.status").value("TABLE_WAITING"));
++        } finally {
++            SecurityContextHolder.clearContext();
++        }
+ 
+         ArgumentCaptor<CreateTableRequestDTO> requestCaptor = ArgumentCaptor.forClass(CreateTableRequestDTO.class);
+         verify(tableService).createTable(eq(hostUserId), requestCaptor.capture());
+         assertEquals("Mesa V1", requestCaptor.getValue().name());
+     }
+ 
+-    @Test
+-    void createTableOnLegacyTablesPathIsNotMapped() throws Exception {
+-        mockMvc.perform(post("/tables")
+-                        .principal(new UsernamePasswordAuthenticationToken(UUID.randomUUID().toString(), null))
+-                        .contentType("application/json")
+-                        .content(objectMapper.writeValueAsString(Map.of("name", "Mesa V1"))))
+-                .andExpect(status().isNotFound());
+-
+-        verifyNoInteractions(tableService);
+-    }
+-
+     @Test
+     void getTableIsMappedAtApiTables() throws Exception {
+         UUID hostUserId = UUID.randomUUID();
+         UUID tableId = UUID.randomUUID();
+         when(tableService.getTable(tableId, hostUserId)).thenReturn(tableResponse(tableId, hostUserId, "Mesa V1"));
+ 
+-        mockMvc.perform(get("/api/tables/{tableId}", tableId)
+-                        .principal(new UsernamePasswordAuthenticationToken(hostUserId.toString(), null)))
+-                .andExpect(status().isOk())
+-                .andExpect(jsonPath("$.tableId").value(tableId.toString()))
+-                .andExpect(jsonPath("$.status").value("TABLE_WAITING"));
++        authenticate(hostUserId);
++        try {
++            mockMvc.perform(get("/api/tables/{tableId}", tableId)
++                            .principal(authentication(hostUserId)))
++                    .andExpect(status().isOk())
++                    .andExpect(jsonPath("$.tableId").value(tableId.toString()))
++                    .andExpect(jsonPath("$.status").value("TABLE_WAITING"));
++        } finally {
++            SecurityContextHolder.clearContext();
++        }
+     }
+ 
+     @Test
+     void createTableRejectsBlankName() throws Exception {
+-        mockMvc.perform(post("/api/tables")
+-                        .principal(new UsernamePasswordAuthenticationToken(UUID.randomUUID().toString(), null))
+-                        .contentType("application/json")
+-                        .content(objectMapper.writeValueAsString(Map.of("name", " "))))
+-                .andExpect(status().isBadRequest())
+-                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
++        authenticate(UUID.randomUUID());
++        try {
++            mockMvc.perform(post("/api/tables")
++                            .contentType("application/json")
++                            .content(objectMapper.writeValueAsString(Map.of("name", " "))))
++                    .andExpect(status().isBadRequest())
++                    .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"));
++        } finally {
++            SecurityContextHolder.clearContext();
++        }
+ 
+         verifyNoInteractions(tableService);
+     }
+ 
++    private void authenticate(UUID userId) {
++        SecurityContextHolder.getContext().setAuthentication(authentication(userId));
++    }
++
++    private UsernamePasswordAuthenticationToken authentication(UUID userId) {
++        return new UsernamePasswordAuthenticationToken(userId.toString(), null, List.of());
++    }
++
+     private TableResponseDTO tableResponse(UUID tableId, UUID hostUserId, String name) {
+         return TableResponseDTO.builder()
+                 .tableId(tableId)
+-- 
+2.43.0
+
