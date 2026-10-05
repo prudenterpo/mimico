@@ -22,12 +22,13 @@ authoritative gameplay, video, chat, reconnection, and rematch.
 | `api-mimico` | authenticated signaling and media pause/resume |
 | `mimico-game` | media session, game-page presentation, four-client harness |
 
-Shared-file ownership for the first verticals:
+Shared-file ownership:
 
-- WebSocket configuration, match-state schema, and the shared event envelope:
-  backend signaling branch. No new Flyway version. `PauseReason.MIME_MEDIA_FAILED`
-  and the V12 check already exist.
-- Game page: frontend media branch. The gameplay Zustand slice and the STOMP
+- WebSocket configuration, match-state schema, and the shared event envelope
+  stay with the backend. Authenticated signaling, mime-media pause, and Flyway
+  V13 (`game_tables.status`) are on `api-mimico` `origin/develop`. Later
+  backend work uses a new Flyway version after V13.
+- Game page: frontend media session. The gameplay Zustand slice and the STOMP
   client class stay unchanged; media uses the existing `stompClient` publish
   and subscribe methods and a separate media store.
 - E2E scaffolding lives on its own frontend branch and does not edit the game
@@ -164,26 +165,28 @@ And leaving the page stops the local tracks
    against PostgreSQL and Redis.
 6. Full behavior suite and integrated review.
 
-Verticals 2, 3, and 4 may proceed in parallel on the branches named in the
-pull requests. Vertical 5 starts after those three agree on the contract.
+Verticals 2, 3, and 4 are on `origin/develop`. The next implementation owner
+is vertical 5 in `mimico-game`: extend `e2e/` until the remaining match
+behaviors fail or pass against PostgreSQL and Redis. Do not rewrite the media
+session. If the harness finds a producer defect, stop and open a bounded
+`api-mimico` change. Vertical 6 is the same suite once those gaps are closed.
 
 ## Integrated findings
 
-A PostgreSQL + Redis four-browser smoke on 2026-10-04 showed three producer
-defects that H2 unit tests did not catch. They must land on `api-mimico`
-before the harness vertical can pass against a real database:
+The three PostgreSQL producer defects found on 2026-10-04 are on `api-mimico`
+`origin/develop` (`474a2f0`):
 
-1. Table HTTP routes must be `/api/tables` to match the frontend client.
-2. `game_tables.status` must be `VARCHAR(32)` and accept the five `TABLE_*`
-   lifecycle values. Flyway V9 still allows only `WAITING`, `IN_PROGRESS`,
-   and `FINISHED`.
-3. Invite delivery must not read the lazy `GameTableEntity.host` outside a
-   persistence session. Pending invites were stored, but
-   `TABLE_INVITE_RECEIVED` was not sent.
+1. `TableController` is mapped at `/api/tables`.
+2. Flyway V13 sets `game_tables.status` to `VARCHAR(32)` and accepts
+   `TABLE_WAITING`, `TABLE_READY_TO_START`, `TABLE_IN_MATCH`,
+   `TABLE_BETWEEN_MATCHES`, and `TABLE_CLOSED`.
+3. `TablePlayerService` is `@Transactional` and reads the host nickname from
+   `userRepository`, so `TABLE_INVITE_RECEIVED` is delivered to the guest.
 
-With those patches and the unmerged frontend media branch, four Chromium
-clients reached one match, rendered four fake-camera tiles, and stopped at
-the host initial-roll selector. That is not workstream completion.
+The 2026-10-04 smoke, and later `mimico-game` PR 9 on `origin/develop`
+(`5e783fd`), reach one match with four fake-camera tiles. Playwright stops
+there. That is not workstream completion. Remaining proof is sorteio through
+rematch, plus any producer gaps the extended harness finds.
 
 ## Risks
 
@@ -205,5 +208,7 @@ Production deployment is out of scope.
 
 ## Rollback
 
-Revert the signaling and media branches independently. No schema migration is
-part of the first verticals, so a database rollback is not required for them.
+Revert the signaling and frontend media changes independently. Flyway V13 is
+already on `api-mimico` `origin/develop`. Reverting signaling or media does
+not reverse that migration. A later correction of table status needs a new
+Flyway version.

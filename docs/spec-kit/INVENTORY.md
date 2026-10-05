@@ -2,28 +2,33 @@
 
 ## Evidence baseline
 
-This inventory was refreshed on 2026-10-04 after fetching both application
-repositories and running one local PostgreSQL + Redis four-browser smoke. It
-records a point-in-time navigation baseline, not live status. Always refresh
-`origin/develop` before relying on it.
+This inventory was refreshed on 2026-10-05 after fetching both application
+repositories. It records a point-in-time navigation baseline, not live status.
+Always refresh `origin/develop` before relying on it.
 
 | Repository | Baseline | Evidence |
 |---|---|---|
-| `api-mimico` | `c7c845f` on `origin/develop` | “Add authenticated match signaling and mime media pause.” |
-| `mimico-game` | `175822e` on `origin/develop` | “Restore paused matches from the server.” |
+| `api-mimico` | `474a2f0` on `origin/develop` | Table HTTP path, Postgres status, and invite host lookup, on top of authenticated match signaling. |
+| `mimico-game` | `5e783fd` on `origin/develop` | Four-client fake-camera Playwright smoke on top of authenticated match video. |
 
-`origin/develop` is the implementation baseline. A later unmerged frontend
-branch and local backend patches were used only for the integrated smoke
-described below. They are not the current application baseline.
+`origin/develop` is the implementation baseline. The repository now owns a
+Playwright four-browser path through lobby, invite, teams, start, and four
+fake-camera tiles. It is not a complete match.
 
 ## Backend capabilities
 
-Verified from `api-mimico@c7c845f`:
+Verified from `api-mimico@474a2f0`:
 
 - registration, login, logout, authenticated profile;
 - lobby presence and chat over WebSocket;
-- table creation, invitation decisions, membership, table chat, manual teams,
-  explicit host start, and leave flow;
+- table creation at `POST /api/tables` and table read at `GET /api/tables/{tableId}`,
+  invitation decisions, membership, table chat, manual teams, explicit host
+  start, and leave flow;
+- Flyway V13: `game_tables.status` is `VARCHAR(32)` and accepts
+  `TABLE_WAITING`, `TABLE_READY_TO_START`, `TABLE_IN_MATCH`,
+  `TABLE_BETWEEN_MATCHES`, and `TABLE_CLOSED`;
+- invite delivery reads the host nickname from `userRepository` inside the
+  `TablePlayerService` transaction, so `TABLE_INVITE_RECEIVED` reaches the guest;
 - persisted match, match player, match state, game round, and private word-card
   models through Flyway V12;
 - initial representative selection and deterministic tie handling;
@@ -38,13 +43,13 @@ Verified from `api-mimico@c7c845f`:
   `LEAVE`) on `/app/match/{matchId}/signal`;
 - mime media unavailable/available commands and `MIME_MEDIA_FAILED` pause.
 
-The branch contains 111 JUnit `@Test` declarations. This count is navigation
+The branch contains 116 JUnit `@Test` declarations. This count is navigation
 evidence only; the suite result must be checked in CI or a clean compatible
 environment before delivery.
 
 ## Frontend capabilities
 
-Verified from `mimico-game@175822e`:
+Verified from `mimico-game@5e783fd`:
 
 - registration, login, lobby, invitation, table, team assignment, and start UI;
 - server-backed gameplay store and typed authoritative match state;
@@ -52,23 +57,27 @@ Verified from `mimico-game@175822e`:
   chat, board positions, round clock, finish, forfeit, and return-to-table flow;
 - refresh recovery and paused-match restoration;
 - reconnecting and paused UI states;
-- responsive gameplay components for board, clock, and pause feedback.
+- responsive gameplay components for board, clock, and pause feedback;
+- a separate media store and `RTCPeerConnection` mesh over the existing STOMP
+  connection;
+- permission, failed-media, mute, camera, and mime-primary tiles on the game
+  page;
+- mime-media unavailable/available reporting during guessing;
+- local track stop on leave and on page unload.
 
-The branch contains 38 frontend test declarations. As with the backend count,
-this does not replace a clean test/build result.
+Application code does not import PeerJS. The empty `src/lib/peer.ts` file is
+gone. The `peerjs` package may still be listed as a dependency.
 
-Video UI is not on `origin/develop`. It exists on the unmerged frontend branch
-`feature/frontend-media-session-462b` (`fdc5050`): a separate media store, an
-`RTCPeerConnection` mesh over the existing STOMP connection, permission and
-mime-media reporting, and game-page tiles. Application code on that branch does
-not open a PeerJS socket.
+The branch contains 49 Vitest declarations plus `e2e/four-client-video.spec.ts`
+(`npm run test:e2e`). The Vitest count does not replace the Playwright result.
 
 ## Integrated four-browser smoke (2026-10-04)
 
-Four isolated Chromium profiles ran against PostgreSQL 16, Redis 7, the local
-backend, and the unmerged frontend media branch.
+Four isolated Chromium profiles ran against PostgreSQL 16, Redis 7, a local
+backend that contained the table fixes now on `474a2f0`, and a frontend media
+branch that is now on `mimico-game` `origin/develop`.
 
-What passed after local backend patches:
+What passed in that smoke:
 
 - four users registered and logged in;
 - the host saw the other three online and created one table;
@@ -83,39 +92,58 @@ What that smoke did not prove:
 - a complete match through natural victory;
 - normal guess, special steal, timeout, abandonment, rematch;
 - disconnect and reconnect without closing the browsers;
-- TURN, real cameras, or a repository-owned four-browser harness.
+- TURN or real cameras.
+
+## Repository four-browser harness (2026-10-05)
+
+`mimico-game` PR 9 is on `origin/develop` (`5e783fd`). Four isolated Chromium
+contexts with `--use-fake-device-for-media-stream` run against `api-mimico`
+`origin/develop`, PostgreSQL 16, and Redis 7. The dedicated workflow
+`e2e-four-client.yml` had a green `four-client-video-smoke` on the PR.
+
+What it proves, matching `e2e/README.md`:
+
+- four browsers authenticate on one table;
+- three guests receive `TABLE_INVITE_RECEIVED` and accept;
+- the host assigns 2+2 and starts;
+- all four open `/game/{tableId}`;
+- each page shows four media tiles with a fake-camera stream.
+
+What it still does not prove: sorteio, palpite, roubo, timeout, abandono,
+vitória natural, rematch, disconnect/reconnect, mime-media pause in the
+browser, TURN.
 
 ## Gaps confirmed by inspection and the smoke
 
-### Video is not on the frontend baseline
+### Video and the lobby-to-tiles harness are on the frontend baseline
 
-- `origin/develop` still has unused `src/lib/peer.ts` and no game-page media.
-- The backend signaling contract is on `origin/develop`; the consumer is not.
-- Permission denial, ICE failure, cleanup, and media-driven pause are not
-  proven on the merged frontend.
+- Producer and consumer agree on authenticated signaling and mime-media pause.
+- Unit tests cover the mesh, permission denial, mime pause/resume, and the
+  primary mime tile.
+- Playwright covers lobby through four tiles. It does not close the
+  workstream.
 
-### Producer defects block a real four-player table
+### Table HTTP contract is aligned
 
-A PostgreSQL run against current `origin/develop` code failed before invites
-could be delivered. H2 tests did not catch these:
+The 2026-10-04 PostgreSQL run failed on three producer defects that H2 tests
+did not catch. Those fixes are on `api-mimico` `origin/develop` (`474a2f0`):
 
-- `TableController` is mapped at `/tables` while the frontend calls
-  `/api/tables`;
-- `game_tables_status_check` still allows only `WAITING`, `IN_PROGRESS`, and
-  `FINISHED`, so inserting `TABLE_WAITING` fails;
-- `sendInvite` reads the lazy `GameTableEntity.host` after the persistence
-  session closed, so Redis recorded pending invites but STOMP never delivered
-  `TABLE_INVITE_RECEIVED`.
+- `TableController` is mapped at `/api/tables`, which matches the frontend
+  client (`NEXT_PUBLIC_API_URL` defaults to `http://localhost:8080/api`, and
+  the store calls `/tables`);
+- Flyway V13 widens `game_tables.status` and accepts the five `TABLE_*`
+  lifecycle values;
+- `sendInvite` reads the host nickname from `userRepository` inside the
+  `TablePlayerService` transaction, so `TABLE_INVITE_RECEIVED` can be delivered.
 
-Those three fixes exist only as a local `api-mimico` branch
-`feature/api-tables-path-075d`. They are not on `origin/develop`.
+The repository harness now exercises that merged table contract.
 
-### Integrated harness is still missing
+### Remaining integrated gaps
 
-- No repository Playwright (or equivalent) four-browser suite exists.
 - Rematch with the same four clients is not proven.
-- A Next.js runtime overlay (“1 issue”) appeared on table and game pages
-  during the smoke and is unresolved.
+- Sorteio, a full round, timeout, abandonment, disconnect, and mime-media
+  pause/resume are not in Playwright.
+- TURN is unresolved.
 
 ### Release readiness is unproven
 
