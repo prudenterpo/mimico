@@ -165,11 +165,11 @@ And leaving the page stops the local tracks
    against PostgreSQL and Redis.
 6. Full behavior suite and integrated review.
 
-Verticals 2 and 3 are on `origin/develop` of `api-mimico` and `mimico-game`.
-The next implementation owner is vertical 4 in `mimico-game`: a four-browser
-harness with fake media devices. That branch must not edit the game page, the
-gameplay store, the media store, or the STOMP adapter. Vertical 5 starts after
-the harness runs against PostgreSQL and Redis.
+Verticals 2, 3, and 4 are on `origin/develop`. The next implementation owner
+is vertical 5 in `mimico-game`: extend `e2e/` until the remaining match
+behaviors fail or pass against PostgreSQL and Redis. Do not rewrite the media
+session. If the harness finds a producer defect, stop and open a bounded
+`api-mimico` change. Vertical 6 is the same suite once those gaps are closed.
 
 ## Integrated findings
 
@@ -183,11 +183,10 @@ The three PostgreSQL producer defects found on 2026-10-04 are on `api-mimico`
 3. `TablePlayerService` is `@Transactional` and reads the host nickname from
    `userRepository`, so `TABLE_INVITE_RECEIVED` is delivered to the guest.
 
-The same smoke, using those table fixes before they were merged and the
-frontend media that is now on `mimico-game` `origin/develop` (`6fcbe15`),
-reached one match with four fake-camera tiles and stopped at the host
-initial-roll selector. That is not workstream completion. The remaining gap is
-a repository-owned four-browser harness against PostgreSQL and Redis.
+The 2026-10-04 smoke, and later `mimico-game` PR 9 on `origin/develop`
+(`5e783fd`), reach one match with four fake-camera tiles. Playwright stops
+there. That is not workstream completion. Remaining proof is sorteio through
+rematch, plus any producer gaps the extended harness finds.
 
 ## Risks
 

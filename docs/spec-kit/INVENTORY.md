@@ -9,12 +9,11 @@ Always refresh `origin/develop` before relying on it.
 | Repository | Baseline | Evidence |
 |---|---|---|
 | `api-mimico` | `474a2f0` on `origin/develop` | Table HTTP path, Postgres status, and invite host lookup, on top of authenticated match signaling. |
-| `mimico-game` | `6fcbe15` on `origin/develop` | Authenticated match video on the game page, plus page-unload track cleanup. |
+| `mimico-game` | `5e783fd` on `origin/develop` | Four-client fake-camera Playwright smoke on top of authenticated match video. |
 
-`origin/develop` is the implementation baseline. The 2026-10-04 four-browser
-smoke described below used the table fixes before they were merged and a
-frontend media branch that is now on `mimico-game` `origin/develop`. That
-smoke reached the initial roll. It is not a complete match.
+`origin/develop` is the implementation baseline. The repository now owns a
+Playwright four-browser path through lobby, invite, teams, start, and four
+fake-camera tiles. It is not a complete match.
 
 ## Backend capabilities
 
@@ -50,7 +49,7 @@ environment before delivery.
 
 ## Frontend capabilities
 
-Verified from `mimico-game@6fcbe15`:
+Verified from `mimico-game@5e783fd`:
 
 - registration, login, lobby, invitation, table, team assignment, and start UI;
 - server-backed gameplay store and typed authoritative match state;
@@ -69,8 +68,8 @@ Verified from `mimico-game@6fcbe15`:
 Application code does not import PeerJS. The empty `src/lib/peer.ts` file is
 gone. The `peerjs` package may still be listed as a dependency.
 
-The branch contains 49 frontend test declarations. As with the backend count,
-this does not replace a clean test/build result.
+The branch contains 49 Vitest declarations plus `e2e/four-client-video.spec.ts`
+(`npm run test:e2e`). The Vitest count does not replace the Playwright result.
 
 ## Integrated four-browser smoke (2026-10-04)
 
@@ -93,16 +92,36 @@ What that smoke did not prove:
 - a complete match through natural victory;
 - normal guess, special steal, timeout, abandonment, rematch;
 - disconnect and reconnect without closing the browsers;
-- TURN, real cameras, or a repository-owned four-browser harness.
+- TURN or real cameras.
+
+## Repository four-browser harness (2026-10-05)
+
+`mimico-game` PR 9 is on `origin/develop` (`5e783fd`). Four isolated Chromium
+contexts with `--use-fake-device-for-media-stream` run against `api-mimico`
+`origin/develop`, PostgreSQL 16, and Redis 7. The dedicated workflow
+`e2e-four-client.yml` had a green `four-client-video-smoke` on the PR.
+
+What it proves, matching `e2e/README.md`:
+
+- four browsers authenticate on one table;
+- three guests receive `TABLE_INVITE_RECEIVED` and accept;
+- the host assigns 2+2 and starts;
+- all four open `/game/{tableId}`;
+- each page shows four media tiles with a fake-camera stream.
+
+What it still does not prove: sorteio, palpite, roubo, timeout, abandono,
+vitória natural, rematch, disconnect/reconnect, mime-media pause in the
+browser, TURN.
 
 ## Gaps confirmed by inspection and the smoke
 
-### Video is on the frontend baseline; the four-browser harness is not
+### Video and the lobby-to-tiles harness are on the frontend baseline
 
 - Producer and consumer agree on authenticated signaling and mime-media pause.
 - Unit tests cover the mesh, permission denial, mime pause/resume, and the
-  primary mime tile. They do not replace four browsers against PostgreSQL and
-  Redis.
+  primary mime tile.
+- Playwright covers lobby through four tiles. It does not close the
+  workstream.
 
 ### Table HTTP contract is aligned
 
@@ -117,14 +136,14 @@ did not catch. Those fixes are on `api-mimico` `origin/develop` (`474a2f0`):
 - `sendInvite` reads the host nickname from `userRepository` inside the
   `TablePlayerService` transaction, so `TABLE_INVITE_RECEIVED` can be delivered.
 
-A fresh four-browser run against this merged baseline has not been repeated.
+The repository harness now exercises that merged table contract.
 
-### Integrated harness is still missing
+### Remaining integrated gaps
 
-- No repository Playwright (or equivalent) four-browser suite exists.
 - Rematch with the same four clients is not proven.
-- A Next.js runtime overlay (“1 issue”) appeared on table and game pages
-  during the smoke and is unresolved.
+- Sorteio, a full round, timeout, abandonment, disconnect, and mime-media
+  pause/resume are not in Playwright.
+- TURN is unresolved.
 
 ### Release readiness is unproven
 
