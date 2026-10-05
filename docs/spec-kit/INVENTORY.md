@@ -2,28 +2,34 @@
 
 ## Evidence baseline
 
-This inventory was refreshed on 2026-10-04 after fetching both application
-repositories and running one local PostgreSQL + Redis four-browser smoke. It
-records a point-in-time navigation baseline, not live status. Always refresh
-`origin/develop` before relying on it.
+This inventory was refreshed on 2026-10-05 after fetching both application
+repositories. It records a point-in-time navigation baseline, not live status.
+Always refresh `origin/develop` before relying on it.
 
 | Repository | Baseline | Evidence |
 |---|---|---|
-| `api-mimico` | `c7c845f` on `origin/develop` | “Add authenticated match signaling and mime media pause.” |
+| `api-mimico` | `474a2f0` on `origin/develop` | Table HTTP path, Postgres status, and invite host lookup, on top of authenticated match signaling. |
 | `mimico-game` | `175822e` on `origin/develop` | “Restore paused matches from the server.” |
 
-`origin/develop` is the implementation baseline. A later unmerged frontend
-branch and local backend patches were used only for the integrated smoke
-described below. They are not the current application baseline.
+`origin/develop` is the implementation baseline. The 2026-10-04 four-browser
+smoke described below used the table fixes before they were merged and an
+unmerged frontend media branch. That smoke is evidence of a path that reached
+the initial roll. It is not the current frontend baseline.
 
 ## Backend capabilities
 
-Verified from `api-mimico@c7c845f`:
+Verified from `api-mimico@474a2f0`:
 
 - registration, login, logout, authenticated profile;
 - lobby presence and chat over WebSocket;
-- table creation, invitation decisions, membership, table chat, manual teams,
-  explicit host start, and leave flow;
+- table creation at `POST /api/tables` and table read at `GET /api/tables/{tableId}`,
+  invitation decisions, membership, table chat, manual teams, explicit host
+  start, and leave flow;
+- Flyway V13: `game_tables.status` is `VARCHAR(32)` and accepts
+  `TABLE_WAITING`, `TABLE_READY_TO_START`, `TABLE_IN_MATCH`,
+  `TABLE_BETWEEN_MATCHES`, and `TABLE_CLOSED`;
+- invite delivery reads the host nickname from `userRepository` inside the
+  `TablePlayerService` transaction, so `TABLE_INVITE_RECEIVED` reaches the guest;
 - persisted match, match player, match state, game round, and private word-card
   models through Flyway V12;
 - initial representative selection and deterministic tie handling;
@@ -38,7 +44,7 @@ Verified from `api-mimico@c7c845f`:
   `LEAVE`) on `/app/match/{matchId}/signal`;
 - mime media unavailable/available commands and `MIME_MEDIA_FAILED` pause.
 
-The branch contains 111 JUnit `@Test` declarations. This count is navigation
+The branch contains 116 JUnit `@Test` declarations. This count is navigation
 evidence only; the suite result must be checked in CI or a clean compatible
 environment before delivery.
 
@@ -57,18 +63,20 @@ Verified from `mimico-game@175822e`:
 The branch contains 38 frontend test declarations. As with the backend count,
 this does not replace a clean test/build result.
 
-Video UI is not on `origin/develop`. It exists on the unmerged frontend branch
-`feature/frontend-media-session-462b` (`fdc5050`): a separate media store, an
-`RTCPeerConnection` mesh over the existing STOMP connection, permission and
-mime-media reporting, and game-page tiles. Application code on that branch does
-not open a PeerJS socket.
+Video UI is not on `origin/develop`. `src/lib/peer.ts` is an empty file there.
+A separate media store, an `RTCPeerConnection` mesh over the existing STOMP
+connection, permission and mime-media reporting, and game-page tiles exist on
+`feature/frontend-media-session-462b` (`fdc5050`), one commit ahead of
+`175822e`. Application code on that branch does not open a PeerJS socket. That
+commit is not the frontend baseline.
 
 ## Integrated four-browser smoke (2026-10-04)
 
-Four isolated Chromium profiles ran against PostgreSQL 16, Redis 7, the local
-backend, and the unmerged frontend media branch.
+Four isolated Chromium profiles ran against PostgreSQL 16, Redis 7, a local
+backend that contained the table fixes now on `474a2f0`, and the unmerged
+frontend media branch.
 
-What passed after local backend patches:
+What passed in that smoke:
 
 - four users registered and logged in;
 - the host saw the other three online and created one table;
@@ -89,26 +97,27 @@ What that smoke did not prove:
 
 ### Video is not on the frontend baseline
 
-- `origin/develop` still has unused `src/lib/peer.ts` and no game-page media.
-- The backend signaling contract is on `origin/develop`; the consumer is not.
+- `mimico-game` `origin/develop` has an empty `src/lib/peer.ts` and no
+  game-page media session.
+- The backend signaling and mime-media pause contract is on `api-mimico`
+  `origin/develop`. The consumer is not.
 - Permission denial, ICE failure, cleanup, and media-driven pause are not
   proven on the merged frontend.
 
-### Producer defects block a real four-player table
+### Table HTTP contract is aligned
 
-A PostgreSQL run against current `origin/develop` code failed before invites
-could be delivered. H2 tests did not catch these:
+The 2026-10-04 PostgreSQL run failed on three producer defects that H2 tests
+did not catch. Those fixes are on `api-mimico` `origin/develop` (`474a2f0`):
 
-- `TableController` is mapped at `/tables` while the frontend calls
-  `/api/tables`;
-- `game_tables_status_check` still allows only `WAITING`, `IN_PROGRESS`, and
-  `FINISHED`, so inserting `TABLE_WAITING` fails;
-- `sendInvite` reads the lazy `GameTableEntity.host` after the persistence
-  session closed, so Redis recorded pending invites but STOMP never delivered
-  `TABLE_INVITE_RECEIVED`.
+- `TableController` is mapped at `/api/tables`, which matches the frontend
+  client (`NEXT_PUBLIC_API_URL` defaults to `http://localhost:8080/api`, and
+  the store calls `/tables`);
+- Flyway V13 widens `game_tables.status` and accepts the five `TABLE_*`
+  lifecycle values;
+- `sendInvite` reads the host nickname from `userRepository` inside the
+  `TablePlayerService` transaction, so `TABLE_INVITE_RECEIVED` can be delivered.
 
-Those three fixes exist only as a local `api-mimico` branch
-`feature/api-tables-path-075d`. They are not on `origin/develop`.
+A fresh four-browser run against this merged baseline has not been repeated.
 
 ### Integrated harness is still missing
 

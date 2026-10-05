@@ -113,8 +113,8 @@ remaining round duration. Reconnect restores from the server snapshot. Redis
 may support presence detection, but PostgreSQL state determines whether a match
 is paused or finished.
 
-The same mechanism may later pause for required mime-media failure, but media
-failure must be distinguishable from network disconnection.
+The same mechanism pauses for required mime-media failure. `PauseReason`
+distinguishes `MIME_MEDIA_FAILED` from `PLAYER_DISCONNECTED`.
 
 ## Video target
 
