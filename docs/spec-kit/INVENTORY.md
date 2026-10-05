@@ -9,12 +9,12 @@ Always refresh `origin/develop` before relying on it.
 | Repository | Baseline | Evidence |
 |---|---|---|
 | `api-mimico` | `474a2f0` on `origin/develop` | Table HTTP path, Postgres status, and invite host lookup, on top of authenticated match signaling. |
-| `mimico-game` | `175822e` on `origin/develop` | “Restore paused matches from the server.” |
+| `mimico-game` | `6fcbe15` on `origin/develop` | Authenticated match video on the game page, plus page-unload track cleanup. |
 
 `origin/develop` is the implementation baseline. The 2026-10-04 four-browser
-smoke described below used the table fixes before they were merged and an
-unmerged frontend media branch. That smoke is evidence of a path that reached
-the initial roll. It is not the current frontend baseline.
+smoke described below used the table fixes before they were merged and a
+frontend media branch that is now on `mimico-game` `origin/develop`. That
+smoke reached the initial roll. It is not a complete match.
 
 ## Backend capabilities
 
@@ -50,7 +50,7 @@ environment before delivery.
 
 ## Frontend capabilities
 
-Verified from `mimico-game@175822e`:
+Verified from `mimico-game@6fcbe15`:
 
 - registration, login, lobby, invitation, table, team assignment, and start UI;
 - server-backed gameplay store and typed authoritative match state;
@@ -58,23 +58,25 @@ Verified from `mimico-game@175822e`:
   chat, board positions, round clock, finish, forfeit, and return-to-table flow;
 - refresh recovery and paused-match restoration;
 - reconnecting and paused UI states;
-- responsive gameplay components for board, clock, and pause feedback.
+- responsive gameplay components for board, clock, and pause feedback;
+- a separate media store and `RTCPeerConnection` mesh over the existing STOMP
+  connection;
+- permission, failed-media, mute, camera, and mime-primary tiles on the game
+  page;
+- mime-media unavailable/available reporting during guessing;
+- local track stop on leave and on page unload.
 
-The branch contains 38 frontend test declarations. As with the backend count,
+Application code does not import PeerJS. The empty `src/lib/peer.ts` file is
+gone. The `peerjs` package may still be listed as a dependency.
+
+The branch contains 49 frontend test declarations. As with the backend count,
 this does not replace a clean test/build result.
-
-Video UI is not on `origin/develop`. `src/lib/peer.ts` is an empty file there.
-A separate media store, an `RTCPeerConnection` mesh over the existing STOMP
-connection, permission and mime-media reporting, and game-page tiles exist on
-`feature/frontend-media-session-462b` (`fdc5050`), one commit ahead of
-`175822e`. Application code on that branch does not open a PeerJS socket. That
-commit is not the frontend baseline.
 
 ## Integrated four-browser smoke (2026-10-04)
 
 Four isolated Chromium profiles ran against PostgreSQL 16, Redis 7, a local
-backend that contained the table fixes now on `474a2f0`, and the unmerged
-frontend media branch.
+backend that contained the table fixes now on `474a2f0`, and a frontend media
+branch that is now on `mimico-game` `origin/develop`.
 
 What passed in that smoke:
 
@@ -95,14 +97,12 @@ What that smoke did not prove:
 
 ## Gaps confirmed by inspection and the smoke
 
-### Video is not on the frontend baseline
+### Video is on the frontend baseline; the four-browser harness is not
 
-- `mimico-game` `origin/develop` has an empty `src/lib/peer.ts` and no
-  game-page media session.
-- The backend signaling and mime-media pause contract is on `api-mimico`
-  `origin/develop`. The consumer is not.
-- Permission denial, ICE failure, cleanup, and media-driven pause are not
-  proven on the merged frontend.
+- Producer and consumer agree on authenticated signaling and mime-media pause.
+- Unit tests cover the mesh, permission denial, mime pause/resume, and the
+  primary mime tile. They do not replace four browsers against PostgreSQL and
+  Redis.
 
 ### Table HTTP contract is aligned
 

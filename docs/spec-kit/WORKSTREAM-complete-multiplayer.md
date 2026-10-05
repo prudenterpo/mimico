@@ -165,10 +165,11 @@ And leaving the page stops the local tracks
    against PostgreSQL and Redis.
 6. Full behavior suite and integrated review.
 
-Vertical 2 is on `api-mimico` `origin/develop`. The next implementation owner
-is vertical 3 in `mimico-game`. Vertical 4 stays on its own frontend branch
-and does not edit the game page, stores, or STOMP adapter. Vertical 5 starts
-after verticals 3 and 4 agree on the contract.
+Verticals 2 and 3 are on `origin/develop` of `api-mimico` and `mimico-game`.
+The next implementation owner is vertical 4 in `mimico-game`: a four-browser
+harness with fake media devices. That branch must not edit the game page, the
+gameplay store, the media store, or the STOMP adapter. Vertical 5 starts after
+the harness runs against PostgreSQL and Redis.
 
 ## Integrated findings
 
@@ -182,10 +183,11 @@ The three PostgreSQL producer defects found on 2026-10-04 are on `api-mimico`
 3. `TablePlayerService` is `@Transactional` and reads the host nickname from
    `userRepository`, so `TABLE_INVITE_RECEIVED` is delivered to the guest.
 
-The same smoke, using those fixes before they were merged and the unmerged
-frontend media branch, reached one match with four fake-camera tiles and
-stopped at the host initial-roll selector. That is not workstream completion.
-The media session is still absent from `mimico-game` `origin/develop`.
+The same smoke, using those table fixes before they were merged and the
+frontend media that is now on `mimico-game` `origin/develop` (`6fcbe15`),
+reached one match with four fake-camera tiles and stopped at the host
+initial-roll selector. That is not workstream completion. The remaining gap is
+a repository-owned four-browser harness against PostgreSQL and Redis.
 
 ## Risks
 
